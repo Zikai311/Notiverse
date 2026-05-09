@@ -1,0 +1,2 @@
+# Notiverse
+Obsidian Mathematics Notes

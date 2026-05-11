@@ -1,6 +1,6 @@
 
 > [!info] Intro
-> Read [[Complex Numbers are Special Kinds of 2×2 Matrices]] first and understand the fact that complex numbers and rotation matrix with scaling are talking about the same thing in different languages, i.e $$a+b\,i\leftrightarrow\begin{pmatrix}a & -b \\  b & a\end{pmatrix}$$This notes focus on how to reinvent the Euler's Identity in Matrix's language.
+> Read [[Complex Numbers are Special Kinds of 2×2 Matrices]] first and understand the fact that complex numbers and rotation matrix with scaling are talking about the same thing in different languages, i.e $$a+b\,i\leftrightarrow\begin{pmatrix}a & -b \\  b & a\end{pmatrix}$$This note focus on how to reinvent the Euler's Identity in Matrix's language.
 
 Recall the exponential power series:
 
@@ -36,9 +36,7 @@ $$
 $$
 Since $J^2=-I,$
 
-the powers of $J$ cycle:
-
-$J^0=I$, $J^1=J$, $J^2=-I$, $J^3=-J$, $J^4=I$, $\dots$ and so on.
+the powers of $J$ cycle: $J^0=I$, $J^1=J$, $J^2=-I$, $J^3=-J$, $J^4=I$, $\dots$ and so on.
 
 Now compute
 

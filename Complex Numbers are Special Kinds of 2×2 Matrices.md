@@ -130,10 +130,6 @@ b & a
 \right\}.
 $$
 
-Complex numbers are not merely “numbers”; they are disguised linear operators on the plane.
-
-
-
 
 # 2. Polar Form and the Rotation Matrix
 Substituting

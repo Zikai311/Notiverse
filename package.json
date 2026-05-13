@@ -1,0 +1,15 @@
+{
+  "name": "notiverse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static Obsidian-style site for the Notiverse vault.",
+  "scripts": {
+    "build": "node scripts/build-site.js",
+    "dev": "node scripts/dev-server.js"
+  },
+  "devDependencies": {
+    "katex": "^0.16.22",
+    "markdown-it": "^14.1.0",
+    "markdown-it-footnote": "^4.0.0"
+  }
+}

@@ -11,7 +11,14 @@
       "query": "tag:#compex_numbers  ",
       "color": {
         "a": 1,
-        "rgb": 8671427
+        "rgb": 11752160
+      }
+    },
+    {
+      "query": "tag:manifold",
+      "color": {
+        "a": 1,
+        "rgb": 4815839
       }
     }
   ],
@@ -21,10 +28,10 @@
   "nodeSizeMultiplier": 1,
   "lineSizeMultiplier": 1,
   "collapse-forces": false,
-  "centerStrength": 0.279991319444444,
-  "repelStrength": 16.7152777777778,
-  "linkStrength": 0.747178819444444,
-  "linkDistance": 245,
-  "scale": 0.9436748845693771,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1.9093883838994399,
   "close": false
 }

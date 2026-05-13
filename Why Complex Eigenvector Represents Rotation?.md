@@ -260,4 +260,4 @@ Final tips: Don't try to visualise $\mathbb{C}^2$ rotation in your head, the alg
 
 [^1]: In In physics (especially quantum mechanics), the convention is often the opposite, i.e conjugate‑linear in the first and linear in the second. Here, we are using the **standard Hermitian inner product** convention in mathematics.
 
-#compex_number #why #matrix_eponential 
+#compex_numbers #why #matrix_eponential 

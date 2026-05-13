@@ -8,77 +8,30 @@
         "type": "tabs",
         "children": [
           {
-            "id": "a483119a539fd484",
+            "id": "125b1542a07a035b",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Polar Form and Euler's Formula.md",
+                "file": "What is a Manifold? An Extrinsic Viewpoint.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Polar Form and Euler's Formula"
+              "title": "What is a Manifold? An Extrinsic Viewpoint"
             }
           },
           {
-            "id": "5612022dca9692d8",
+            "id": "7624d18755d70883",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "The Matrix Operator View of Euler’s Identity.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "The Matrix Operator View of Euler’s Identity"
-            }
-          },
-          {
-            "id": "95230c9410e86950",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "README.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "README"
-            }
-          },
-          {
-            "id": "c2190fa296f08f69",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Polar Form and Euler's Formula.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Polar Form and Euler's Formula"
-            }
-          },
-          {
-            "id": "4cfdf6860bfc6e9e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Complex Numbers are Special Kinds of 2×2 Matrices.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Complex Numbers are Special Kinds of 2×2 Matrices"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "vertical"
@@ -110,7 +63,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#matrix_eponential",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -136,7 +89,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 237.5,
+    "width": 200,
     "collapsed": true
   },
   "right": {
@@ -153,7 +106,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Polar Form and Euler's Formula.md",
+                "file": "What is a Manifold? An Extrinsic Viewpoint.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -163,7 +116,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Polar Form and Euler's Formula"
+              "title": "Backlinks for What is a Manifold? An Extrinsic Viewpoint"
             }
           },
           {
@@ -172,12 +125,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Polar Form and Euler's Formula.md",
+                "file": "What is a Manifold? An Extrinsic Viewpoint.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Polar Form and Euler's Formula"
+              "title": "Outgoing links from What is a Manifold? An Extrinsic Viewpoint"
             }
           },
           {
@@ -215,13 +168,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Polar Form and Euler's Formula.md",
+                "file": "What is a Manifold? An Extrinsic Viewpoint.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Polar Form and Euler's Formula"
+              "title": "Outline of What is a Manifold? An Extrinsic Viewpoint"
             }
           },
           {
@@ -255,12 +208,14 @@
       "terminal:Open terminal": false
     }
   },
-  "active": "c2190fa296f08f69",
+  "active": "125b1542a07a035b",
   "lastOpenFiles": [
-    "Why Complex Eigenvector Represents Rotation.md",
+    "What is a Manifold? An Extrinsic Viewpoint.md",
+    "Why Complex Eigenvector Represents Rotation?.md",
+    "Untitled.md",
+    "Complex Numbers are Special Kinds of 2×2 Matrices.md",
     "Polar Form and Euler's Formula.md",
     "The Matrix Operator View of Euler’s Identity.md",
-    "Complex Numbers are Special Kinds of 2×2 Matrices.md",
     "README.md",
     "Untitled.base",
     "Welcome.md",

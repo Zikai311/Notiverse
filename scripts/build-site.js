@@ -505,9 +505,6 @@ function buildIndexHtml(assetVersion) {
       </aside>
 
       <aside class="left-pane" aria-label="Vault navigation">
-        <div class="pane-tabs">
-          <button class="pane-tab active">Files</button>
-        </div>
         <label class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <input id="search-input" type="search" placeholder="Search notes">
@@ -727,7 +724,6 @@ a:hover {
   pointer-events: none;
 }
 
-.pane-tabs,
 .workspace-tabs {
   display: flex;
   align-items: stretch;
@@ -736,7 +732,6 @@ a:hover {
   background: #18131f;
 }
 
-.pane-tab,
 .workspace-tab {
   border: 0;
   border-right: 1px solid var(--border-soft);
@@ -746,12 +741,6 @@ a:hover {
   cursor: pointer;
 }
 
-.pane-tab {
-  padding: 0 14px;
-  font-size: 12px;
-}
-
-.pane-tab.active,
 .workspace-tab.active {
   background: var(--surface);
   color: var(--text-bright);
@@ -1393,7 +1382,7 @@ function buildAppJs() {
     elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
     if (currentView === "graph") requestAnimationFrame(() => {
       graph.resize();
-      graph.fit();
+      setTimeout(() => currentView === "graph" && graph.resize(), 170);
     });
   }
 
@@ -1401,8 +1390,7 @@ function buildAppJs() {
     if (currentView !== "graph") return;
     requestAnimationFrame(() => {
       graph.resize();
-      graph.fit();
-      setTimeout(() => currentView === "graph" && graph.fit(), 160);
+      setTimeout(() => currentView === "graph" && graph.resize(), 170);
     });
   }
 
@@ -1454,12 +1442,17 @@ function buildAppJs() {
     let movedPointer = false;
     let activeId = null;
     let hovered = null;
+    let resizeObserver = null;
 
     requestAnimationFrame(() => {
       resize();
       tick();
     });
     window.addEventListener("resize", resize);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => resize());
+      resizeObserver.observe(canvas);
+    }
 
     canvas.addEventListener("pointerdown", (event) => {
       const point = eventPoint(event);
@@ -1670,7 +1663,9 @@ function buildAppJs() {
       const maxY = Math.max(...nodes.map((node) => node.y));
       const graphWidth = Math.max(1, maxX - minX);
       const graphHeight = Math.max(1, maxY - minY);
-      camera.scale = clamp(Math.min(width / (graphWidth + 180), height / (graphHeight + 180)), 0.35, 2.2);
+      const fitPadding = Math.max(360, Math.min(width, height) * 0.34);
+      const fittedScale = Math.min(width / (graphWidth + fitPadding), height / (graphHeight + fitPadding)) * 0.82;
+      camera.scale = clamp(fittedScale, 0.28, 1.25);
       camera.x = -((minX + maxX) / 2) * camera.scale;
       camera.y = -((minY + maxY) / 2) * camera.scale;
       alpha = Math.max(alpha, 0.25);

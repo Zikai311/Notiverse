@@ -188,7 +188,7 @@
     elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
     if (currentView === "graph") requestAnimationFrame(() => {
       graph.resize();
-      graph.fit();
+      setTimeout(() => currentView === "graph" && graph.resize(), 170);
     });
   }
 
@@ -196,8 +196,7 @@
     if (currentView !== "graph") return;
     requestAnimationFrame(() => {
       graph.resize();
-      graph.fit();
-      setTimeout(() => currentView === "graph" && graph.fit(), 160);
+      setTimeout(() => currentView === "graph" && graph.resize(), 170);
     });
   }
 
@@ -249,12 +248,17 @@
     let movedPointer = false;
     let activeId = null;
     let hovered = null;
+    let resizeObserver = null;
 
     requestAnimationFrame(() => {
       resize();
       tick();
     });
     window.addEventListener("resize", resize);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => resize());
+      resizeObserver.observe(canvas);
+    }
 
     canvas.addEventListener("pointerdown", (event) => {
       const point = eventPoint(event);
@@ -465,7 +469,9 @@
       const maxY = Math.max(...nodes.map((node) => node.y));
       const graphWidth = Math.max(1, maxX - minX);
       const graphHeight = Math.max(1, maxY - minY);
-      camera.scale = clamp(Math.min(width / (graphWidth + 180), height / (graphHeight + 180)), 0.35, 2.2);
+      const fitPadding = Math.max(360, Math.min(width, height) * 0.34);
+      const fittedScale = Math.min(width / (graphWidth + fitPadding), height / (graphHeight + fitPadding)) * 0.82;
+      camera.scale = clamp(fittedScale, 0.28, 1.25);
       camera.x = -((minX + maxX) / 2) * camera.scale;
       camera.y = -((minY + maxY) / 2) * camera.scale;
       alpha = Math.max(alpha, 0.25);

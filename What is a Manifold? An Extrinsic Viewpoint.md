@@ -249,6 +249,15 @@ In essence, a smooth manifold is locally the zero set of a smooth map whose deri
 ---
 
 TODO: 
+
+
+
+
+
+
+
+
+
 # Proof Using the Implicit Function Theorem
 
 We want to prove:

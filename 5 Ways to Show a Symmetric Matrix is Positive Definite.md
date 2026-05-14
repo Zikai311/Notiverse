@@ -1,69 +1,87 @@
 
 > [!info] Intro
-> A positive-definite matrix is a symmetric matrix such that all eigenvalues are positive real numbers. In this notes, we emphasise in $2\times 2$ matrices with the form 
+> A symmetric matrix $M$ is **positive definite** if
+> $$
+>	\mathbf{x}^\text{T}M\mathbf{x}>0
+> $$
+> for every nonzero vector $\mathbf{x}\neq \mathbf{0}$.
+>
+> For a symmetric matrix, this is equivalent to saying that all eigenvalues are positive real numbers. In this note, we start with the $2\times 2$ case
 > $$
 >	M=\begin{pmatrix}
 >	a & b \\
 >	b & c
 >	\end{pmatrix}
 > $$
+> and then move to the general $n\times n$ versions.
 
 
 # Method 1. Find the Determinant
 
 
-> [!quote] Theroem 1
+> [!quote] Theorem 1
+> 
 > $$
-> M=\begin{pmatrix}
+> M=
+>	\begin{pmatrix}
 >	a & b \\
 >	b & c
 >	\end{pmatrix}
- >$$
-> *$M$ is positive definite if and only if $ac-b^2>0$ and at least one of $a$ or $c$ is positive.*
+> $$
+> *$M$ is positive definite if and only if $a>0$ and $ac-b^2>0$.*
+>
+> Equivalently, $ac-b^2>0$ and at least one of $a$ or $c$ is positive. In that case, both $a$ and $c$ are positive.
 
 $\implies$
 $$
 	M\mathbf{v}=\lambda \mathbf{v} \quad\text{for} \;\mathbf{v}\neq \mathbf{0}
 $$
-If $A$ is positive-definite, then for all eigenvalues, $\lambda_{1}>0$ and $\lambda_{2}>0$.
+If $M$ is positive definite, then all eigenvalues are positive, so $\lambda_{1}>0$ and $\lambda_{2}>0$.
 
-hence,
+Hence,
 $$
 	\det(M)=\lambda_{1}\lambda_{2}=ac-b^2>0
 $$
+Also, using the quadratic form with $\mathbf{e}_{1}=(1,0)^\text{T}$,
 $$
-	\mathrm{tr}(M)=\lambda_{1}+\lambda_{2}=a+c>0
+	\mathbf{e}_{1}^\text{T}M\mathbf{e}_{1}=a>0
 $$
-Since $ab-c^2>0$, $ac>0$
-
-With $a+c>0$, then $a>0$ and $c>0$.
+Therefore $a>0$ and $ac-b^2>0$.
 
 $\Longleftarrow$
 
-$$\det(M)=ac-b^2>0$$
-Again, since $ab-c^2>0$, $ac>0$.
+Assume
+$$
+	a>0
+$$
+and
+$$
+	\det(M)=ac-b^2>0
+$$
+Since $ac-b^2>0$, we have $ac>b^2\geq 0$, so $ac>0$.
 
-With at least one of $a$ or $c$ is positive, then $a>0$ and $c>0$.
+Because $a>0$, this implies $c>0$.
 $$
 	\mathrm{tr}(M)=a+c>0
 $$
-since
+Also,
 $$
 	\det(M)=\lambda_{1}\lambda_{2}>0
 $$
 $$
 	\mathrm{tr}(M)=\lambda_{1}+\lambda_{2}>0
 $$
-, so $\lambda_{1}>0$ and $\lambda_{2}>0$ $\implies$ M is positive definite.
+Since $M$ is symmetric, $\lambda_{1}$ and $\lambda_{2}$ are real. Their product is positive, so they have the same sign. Their sum is positive, so they must both be positive.
+
+Thus $\lambda_{1}>0$ and $\lambda_{2}>0$, so $M$ is positive definite.
 
 > [!quote] Theorem 2
 >
  >
-> *A symmetric matrix $M$ is positive definite if and only if the upper triangle matrix have all $\text{pivots}>0$ after Gaussian elimination.*
+> *A symmetric matrix $M$ is positive definite if and only if the upper triangular matrix has all $\text{pivots}>0$ after Gaussian elimination.*
 
 $\implies$
-Using **Theorem 1**, we get $a>0$, $c>0$ and $ab-c^2>0$.
-(It's not hard to acquire both $a$ and $c$ are positive from result of **Theorem 1**)
+Using **Theorem 1**, we get $a>0$ and $ac-b^2>0$.
 
 Hence in the upper triangular matrix after Gaussian elimination
 $$
@@ -92,16 +110,26 @@ $$
 	0 & c-\frac{b^2}{a}
 	\end{pmatrix}
 $$
-where $a>0$ and $c-\frac{b_{b^2}}{a}>0$. 
+where
+$$
+	a>0
+$$
+and
+$$
+	c-\frac{b^2}{a}>0
+$$
 
-Hence, $ac-b^2>0$.
+Since $a>0$, multiplying the second pivot by $a$ gives
+$$
+	ac-b^2>0
+$$
 
 Using **Theorem 1** $\implies$ M is positive definite.
 
 
 
 > [!quote] Theorem 3
-> *A symmetric matrix A is positive definite if and only if all its leading principal minors (upper-left sub-determinants) are strictly positive. For an $n \times n$ matrix, this requires:*
+> *A symmetric matrix $M$ is positive definite if and only if all its leading principal minors (upper-left sub-determinants) are strictly positive. For an $n \times n$ matrix, this requires:*
 > $$\det_1 > 0, \det_2 > 0, \dots, \det_n > 0$$
 
 $\iff$ **Theorem 1** in the $2\times 2$ case.
@@ -133,43 +161,47 @@ $$
 	\end{vmatrix}=3>0
 $$
 $$
-	\det_{3}\begin{vmatrix}
+	\det_{3}=\begin{vmatrix}
 	2 & 1 & 1 \\
 	1 & 2 & 1 \\
 	1 & 1 & 2
 	\end{vmatrix}=4>0
 $$
-apply **Theorem 3**, $M$ is positive definite.
+Apply **Theorem 3**, $M$ is positive definite.
 
 
 > [!quote] Theorem 4
-> *A symmetric matrix A is positive definite if and only if for all $\mathbf{x}\neq_{0}$,*
+> *For a symmetric matrix $M$, all eigenvalues are positive if and only if for every $\mathbf{x}\neq \mathbf{0}$,*
 > $$
 >	\mathbf{x}^\text{T}M\mathbf{x}>0
 > $$
 
 
 $\implies$
-consider the unified eigenvectors $\mathbf{q}$
+Assume that all eigenvalues of $M$ are positive. Since $M$ is symmetric, by the **Spectral Theorem**, there is an orthonormal eigenbasis
 $$
-	M \mathbf{q}=\lambda \mathbf{q}
+	\mathbf{q}_{1},\mathbf{q}_{2},\dots,\mathbf{q}_{n}
 $$
-for $\mathbf{x}=c_{1}\mathbf{q_{1}}+c_{2}\mathbf{q_{2}}+\dots+ c_{n}\mathbf{q_{n}}$
+with
 $$
-	\mathbf{x}^\text{T}M\mathbf{x}=(c_{1}\mathbf{q_{1}}+\dots+ c_{n}\mathbf{q_{n}})(c_{1}\lambda_{1}\mathbf{q_{1}}+\dots +c_{n\lambda_{n}\mathbf{q_{n}}})
+	M \mathbf{q}_{i}=\lambda_i \mathbf{q}_{i}
 $$
-since $M$ is a symmetric matrix, by **Spectral Theorem**, $\mathbf{q_{i}}$ and $\mathbf{q_{j}}$ must be perpendicular if $i\neq j$.
-
-so $$c_{i}\mathbf{q}_{i}\;c_{j}\lambda{j}\mathbf{q}_{j}=0$$
-for the rest of $i=j$
+For any nonzero vector $\mathbf{x}$, write
 $$
-	\mathbf{q}^\text{T}M\mathbf{q}=\mathbf{q}^\text{T}\lambda\mathbf{q}=\lambda\,\|\mathbf{q}\|^2=\lambda
+	\mathbf{x}=c_{1}\mathbf{q}_{1}+c_{2}\mathbf{q}_{2}+\dots+c_{n}\mathbf{q}_{n}
 $$
-combine the two results, expand the brackets
+Then
+$$
+	M\mathbf{x}=c_{1}\lambda_{1}\mathbf{q}_{1}+c_{2}\lambda_{2}\mathbf{q}_{2}+\dots+c_{n}\lambda_{n}\mathbf{q}_{n}
+$$
+Using orthonormality, $\mathbf{q}_{i}^\text{T}\mathbf{q}_{j}=0$ if $i\neq j$ and $\mathbf{q}_{i}^\text{T}\mathbf{q}_{i}=1$, so
 $$
 	\mathbf{x}^\text{T}M\mathbf{x}=c_{1}^2\lambda_{1}+c_{2}^2\lambda_{2}+\dots+c_{n}^2\lambda_{n}
 $$
-since $M$ is positive definite, $\lambda>0$ so $\mathbf{x}^\text{T}M\mathbf{x}>0$.
+Since $\mathbf{x}\neq \mathbf{0}$, at least one coefficient $c_i$ is nonzero. Since every $\lambda_i>0$,
+$$
+	\mathbf{x}^\text{T}M\mathbf{x}>0
+$$
 
 $\Longleftarrow$
 assume that for every $\mathbf{x}\neq \mathbf{0}$,
@@ -199,7 +231,7 @@ This is true for every eigenvalue of $M$, so all eigenvalues are positive. There
 
 
 > [!quote] Theorem 5
-> *A symmetric matrix A is positive definite if and only if $M$ could be written as*
+> *A symmetric matrix $M$ is positive definite if and only if $M$ can be written as*
 > 
 > $$
 >	M=A^TA
@@ -260,4 +292,8 @@ $$
 $$
 since $A$ is of full column rank and $\mathbf{x}\neq 0$, any linear combination other than all zero cannot build up a zero vector.
 $$\|A\mathbf{x}\|^2>0$$
-so $$\mathbf{x}^\text{T}M\mathbf{x}>0$$Using **Theorem 4**, $M$ is positive definite.
+so
+$$
+	\mathbf{x}^\text{T}M\mathbf{x}>0
+$$
+Using **Theorem 4**, $M$ is positive definite.

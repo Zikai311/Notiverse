@@ -525,7 +525,7 @@ function buildIndexHtml() {
           </button>
           <div class="top-actions">
             <button id="right-sidebar-toggle" class="top-action-button active" title="Toggle right sidebar" aria-label="Toggle right sidebar" aria-pressed="true">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M15 5v14"/><path d="M8 9h4M8 12h4M8 15h4"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="5" width="15" height="14" rx="2.5"/><path d="M15.5 7.5v9"/></svg>
             </button>
           </div>
         </div>
@@ -631,14 +631,16 @@ a:hover {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) minmax(220px, 300px);
+  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) var(--right-pane-width);
   height: 100vh;
   min-height: 0;
   background: var(--bg);
+  --right-pane-width: 280px;
+  transition: grid-template-columns 140ms ease-out;
 }
 
 .app-shell.right-pane-hidden {
-  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) 0;
+  --right-pane-width: 0px;
 }
 
 .ribbon {
@@ -706,10 +708,18 @@ a:hover {
   gap: 14px;
   padding: 12px;
   border-left: 1px solid var(--border-soft);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 100ms ease-out, padding 140ms ease-out, border-color 140ms ease-out;
 }
 
 .app-shell.right-pane-hidden .right-pane {
-  display: none;
+  width: 0;
+  padding: 12px 0;
+  border-left: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .pane-tabs,
@@ -1149,11 +1159,22 @@ a:hover {
 
 @media (max-width: 1040px) {
   .app-shell {
-    grid-template-columns: 42px minmax(190px, 230px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    --right-pane-width: 0px;
   }
 
+  .ribbon,
+  .left-pane,
   .right-pane {
     display: none;
+  }
+
+  .top-actions {
+    display: none;
+  }
+
+  .workspace-tabs {
+    height: 44px;
   }
 }
 
@@ -1163,12 +1184,8 @@ a:hover {
   }
 
   .app-shell {
-    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     height: 100dvh;
-  }
-
-  .left-pane {
-    display: none;
   }
 
   .workspace {
@@ -1239,6 +1256,7 @@ function buildAppJs() {
     elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
+    window.addEventListener("resize", handleWindowResize);
 
     document.querySelectorAll("[data-route]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1372,7 +1390,19 @@ function buildAppJs() {
     document.querySelector(".app-shell").classList.toggle("right-pane-hidden", !rightSidebarVisible);
     elements.rightSidebarToggle.classList.toggle("active", rightSidebarVisible);
     elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
-    if (currentView === "graph") requestAnimationFrame(() => graph.resize());
+    if (currentView === "graph") requestAnimationFrame(() => {
+      graph.resize();
+      graph.fit();
+    });
+  }
+
+  function handleWindowResize() {
+    if (currentView !== "graph") return;
+    requestAnimationFrame(() => {
+      graph.resize();
+      graph.fit();
+      setTimeout(() => currentView === "graph" && graph.fit(), 160);
+    });
   }
 
   function showGraphTip(node, point) {

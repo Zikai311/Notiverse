@@ -52,6 +52,7 @@
     elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
+    window.addEventListener("resize", handleWindowResize);
 
     document.querySelectorAll("[data-route]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -185,7 +186,19 @@
     document.querySelector(".app-shell").classList.toggle("right-pane-hidden", !rightSidebarVisible);
     elements.rightSidebarToggle.classList.toggle("active", rightSidebarVisible);
     elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
-    if (currentView === "graph") requestAnimationFrame(() => graph.resize());
+    if (currentView === "graph") requestAnimationFrame(() => {
+      graph.resize();
+      graph.fit();
+    });
+  }
+
+  function handleWindowResize() {
+    if (currentView !== "graph") return;
+    requestAnimationFrame(() => {
+      graph.resize();
+      graph.fit();
+      setTimeout(() => currentView === "graph" && graph.fit(), 160);
+    });
   }
 
   function showGraphTip(node, point) {

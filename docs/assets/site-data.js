@@ -1,5 +1,5 @@
 window.NOTIVERSE_DATA = {
-  "generatedAt": "2026-05-14T00:48:21.785Z",
+  "generatedAt": "2026-05-14T01:00:00.366Z",
   "defaultSlug": "what-is-a-manifold-an-extrinsic-viewpoint",
   "notes": [
     {

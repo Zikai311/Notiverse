@@ -58,14 +58,16 @@ a:hover {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) minmax(220px, 300px);
+  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) var(--right-pane-width);
   height: 100vh;
   min-height: 0;
   background: var(--bg);
+  --right-pane-width: 280px;
+  transition: grid-template-columns 140ms ease-out;
 }
 
 .app-shell.right-pane-hidden {
-  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) 0;
+  --right-pane-width: 0px;
 }
 
 .ribbon {
@@ -133,10 +135,18 @@ a:hover {
   gap: 14px;
   padding: 12px;
   border-left: 1px solid var(--border-soft);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 100ms ease-out, padding 140ms ease-out, border-color 140ms ease-out;
 }
 
 .app-shell.right-pane-hidden .right-pane {
-  display: none;
+  width: 0;
+  padding: 12px 0;
+  border-left: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .pane-tabs,
@@ -576,11 +586,22 @@ a:hover {
 
 @media (max-width: 1040px) {
   .app-shell {
-    grid-template-columns: 42px minmax(190px, 230px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    --right-pane-width: 0px;
   }
 
+  .ribbon,
+  .left-pane,
   .right-pane {
     display: none;
+  }
+
+  .top-actions {
+    display: none;
+  }
+
+  .workspace-tabs {
+    height: 44px;
   }
 }
 
@@ -590,12 +611,8 @@ a:hover {
   }
 
   .app-shell {
-    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     height: 100dvh;
-  }
-
-  .left-pane {
-    display: none;
   }
 
   .workspace {

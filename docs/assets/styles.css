@@ -219,7 +219,6 @@ a:hover {
 }
 
 .file-item {
-  gap: 7px;
   width: 100%;
   padding: 6px 8px;
   font-size: 13px;
@@ -232,15 +231,6 @@ a:hover {
 .tag-pill.active {
   background: var(--surface-3);
   text-decoration: none;
-}
-
-.file-icon,
-.tab-icon {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  border: 1px solid var(--faint);
-  border-radius: 2px;
 }
 
 .file-title,
@@ -339,9 +329,15 @@ a:hover {
   stroke-linejoin: round;
 }
 
-.graph-icon {
-  border-radius: 50%;
-  border-color: var(--accent-2);
+.tab-graph-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .view {

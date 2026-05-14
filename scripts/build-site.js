@@ -500,7 +500,6 @@ function buildIndexHtml() {
       <aside class="left-pane" aria-label="Vault navigation">
         <div class="pane-tabs">
           <button class="pane-tab active">Files</button>
-          <button class="pane-tab" data-panel="search-panel">Search</button>
         </div>
         <label class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -516,11 +515,10 @@ function buildIndexHtml() {
       <main class="workspace">
         <div class="workspace-tabs">
           <button id="note-tab" class="workspace-tab active">
-            <span class="tab-icon"></span>
             <span id="note-tab-title">Note</span>
           </button>
           <button id="graph-tab" class="workspace-tab">
-            <span class="tab-icon graph-icon"></span>
+            <svg class="tab-graph-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm10-5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="m9.4 9.5 5.2-3M9.7 14.1l4.8 2.8"/></svg>
             <span>Graph view</span>
           </button>
           <div class="top-actions">
@@ -792,7 +790,6 @@ a:hover {
 }
 
 .file-item {
-  gap: 7px;
   width: 100%;
   padding: 6px 8px;
   font-size: 13px;
@@ -805,15 +802,6 @@ a:hover {
 .tag-pill.active {
   background: var(--surface-3);
   text-decoration: none;
-}
-
-.file-icon,
-.tab-icon {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  border: 1px solid var(--faint);
-  border-radius: 2px;
 }
 
 .file-title,
@@ -912,9 +900,15 @@ a:hover {
   stroke-linejoin: round;
 }
 
-.graph-icon {
-  border-radius: 50%;
-  border-color: var(--accent-2);
+.tab-graph-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .view {
@@ -1347,7 +1341,7 @@ function buildAppJs() {
     });
 
     elements.fileList.innerHTML = filtered
-      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-icon"></span><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
+      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
       .join("");
 
     elements.tagList.innerHTML = data.tags
@@ -1367,7 +1361,7 @@ function buildAppJs() {
 
   function renderContextLinks(links) {
     if (!links.length) return '<div class="context-empty">No links</div>';
-    return links.map((link) => '<a class="context-link" href="#/note/' + encodeURIComponent(link.slug) + '"><span class="file-icon"></span><span>' + escapeHtml(link.title) + '</span></a>').join("");
+    return links.map((link) => '<a class="context-link" href="#/note/' + encodeURIComponent(link.slug) + '"><span>' + escapeHtml(link.title) + '</span></a>').join("");
   }
 
   function updateActiveStates() {

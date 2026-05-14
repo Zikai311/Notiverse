@@ -143,7 +143,7 @@
     });
 
     elements.fileList.innerHTML = filtered
-      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-icon"></span><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
+      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
       .join("");
 
     elements.tagList.innerHTML = data.tags
@@ -163,7 +163,7 @@
 
   function renderContextLinks(links) {
     if (!links.length) return '<div class="context-empty">No links</div>';
-    return links.map((link) => '<a class="context-link" href="#/note/' + encodeURIComponent(link.slug) + '"><span class="file-icon"></span><span>' + escapeHtml(link.title) + '</span></a>').join("");
+    return links.map((link) => '<a class="context-link" href="#/note/' + encodeURIComponent(link.slug) + '"><span>' + escapeHtml(link.title) + '</span></a>').join("");
   }
 
   function updateActiveStates() {

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const MarkdownIt = require("markdown-it");
 const markdownItFootnote = require("markdown-it-footnote");
 const katex = require("katex");
@@ -95,31 +96,29 @@ for (const note of notes) {
 
 const graph = buildGraph(notes, graphConfig);
 const defaultSlug = inferDefaultSlug(workspaceConfig) || notes[0]?.slug || "";
-const generatedAt = new Date().toISOString();
-const assetVersion = generatedAt.replace(/\D/g, "").slice(0, 14);
+const siteData = {
+  defaultSlug,
+  notes,
+  tags: [...tagCounts.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
+  graph,
+  graphConfig: normalizeGraphConfig(graphConfig),
+  workspace: {
+    lastOpenFiles: workspaceConfig.lastOpenFiles || [],
+  },
+};
+const stylesCss = buildStylesCss();
+const appJs = buildAppJs();
+const siteDataJs = `window.NOTIVERSE_DATA = ${JSON.stringify(siteData, null, 2)};\n`;
+const assetVersion = contentHash(stylesCss, appJs, siteDataJs);
 
 fs.mkdirSync(assetsDir, { recursive: true });
 
 writeFile("index.html", buildIndexHtml(assetVersion));
-writeFile("assets/styles.css", buildStylesCss());
-writeFile("assets/app.js", buildAppJs());
-writeFile("assets/site-data.js", `window.NOTIVERSE_DATA = ${JSON.stringify(
-  {
-    generatedAt,
-    defaultSlug,
-    notes,
-    tags: [...tagCounts.entries()]
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
-    graph,
-    graphConfig: normalizeGraphConfig(graphConfig),
-    workspace: {
-      lastOpenFiles: workspaceConfig.lastOpenFiles || [],
-    },
-  },
-  null,
-  2,
-)};\n`);
+writeFile("assets/styles.css", stylesCss);
+writeFile("assets/app.js", appJs);
+writeFile("assets/site-data.js", siteDataJs);
 writeFile(".nojekyll", "");
 
 copyKatexAssets();
@@ -464,6 +463,12 @@ function writeFile(relativePath, contents) {
   const file = path.join(docsDir, relativePath);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, contents);
+}
+
+function contentHash(...values) {
+  const hash = crypto.createHash("sha256");
+  for (const value of values) hash.update(value);
+  return hash.digest("hex").slice(0, 12);
 }
 
 function copyKatexAssets() {

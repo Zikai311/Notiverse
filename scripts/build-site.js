@@ -111,7 +111,8 @@ const siteData = {
 const stylesCss = buildStylesCss();
 const appJs = buildAppJs();
 const siteDataJs = `window.NOTIVERSE_DATA = ${JSON.stringify(siteData, null, 2)};\n`;
-const assetVersion = contentHash(stylesCss, appJs, siteDataJs);
+const faviconSvg = buildFaviconSvg();
+const assetVersion = contentHash(stylesCss, appJs, siteDataJs, faviconSvg);
 
 fs.mkdirSync(assetsDir, { recursive: true });
 
@@ -119,6 +120,7 @@ writeFile("index.html", buildIndexHtml(assetVersion));
 writeFile("assets/styles.css", stylesCss);
 writeFile("assets/app.js", appJs);
 writeFile("assets/site-data.js", siteDataJs);
+writeFile("assets/favicon.svg", faviconSvg);
 writeFile(".nojekyll", "");
 
 copyKatexAssets();
@@ -490,6 +492,7 @@ function buildIndexHtml(assetVersion) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <title>Notiverse</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=${assetVersion}">
     <link rel="stylesheet" href="assets/katex.min.css?v=${assetVersion}">
     <link rel="stylesheet" href="assets/styles.css?v=${assetVersion}">
   </head>
@@ -1188,6 +1191,22 @@ a:hover {
     font-size: 15px;
   }
 }
+`;
+}
+
+function buildFaviconSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <path d="M34 4 49 19 53 38 40 56 20 53 8 36 17 17Z" fill="#120b1d"/>
+  <path d="M34 6 22 19 27 35 43 33 48 20Z" fill="#a77bff"/>
+  <path d="M22 19 9 36 20 52 27 35Z" fill="#8e63f3"/>
+  <path d="M27 35 20 52 39 55 43 33Z" fill="#b88cff"/>
+  <path d="M43 33 39 55 52 38 48 20Z" fill="#7d55df"/>
+  <path d="M34 6 27 35 43 33 48 20Z" fill="#c8a8ff" opacity=".78"/>
+  <path d="M34 6 22 19 17 17Z" fill="#d7c1ff"/>
+  <path d="M34 6 49 19 48 20Z" fill="#7a4ee8"/>
+  <path d="M34 6 22 19 9 36 20 52 39 55 52 38 48 20 49 19Z" fill="none" stroke="#07040b" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M22 19 27 35 20 52M27 35 43 33 39 55M43 33 48 20M27 35 34 6" fill="none" stroke="#241633" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
 `;
 }
 

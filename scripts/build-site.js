@@ -1246,6 +1246,7 @@ function buildAppJs() {
     elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
+    elements.noteContent.addEventListener("click", handleNoteContentClick);
     window.addEventListener("resize", handleWindowResize);
 
     document.querySelectorAll("[data-route]").forEach((button) => {
@@ -1307,9 +1308,37 @@ function buildAppJs() {
 
     requestAnimationFrame(() => {
       const anchor = decodeURIComponent(location.hash.split("#").slice(2).join("#"));
-      if (anchor) document.getElementById(anchor)?.scrollIntoView({ block: "start" });
+      if (anchor) scrollNoteToAnchor(anchor);
       else elements.noteView.scrollTop = 0;
     });
+  }
+
+  function handleNoteContentClick(event) {
+    const target = event.target instanceof Element ? event.target : event.target.parentElement;
+    const link = target?.closest('a[href^="#"]');
+    if (!link || !elements.noteContent.contains(link)) return;
+
+    const href = link.getAttribute("href");
+    if (!href || href === "#" || href.startsWith("#/")) return;
+
+    const anchor = decodeURIComponent(href.slice(1));
+    if (!anchor || !scrollNoteToAnchor(anchor)) return;
+
+    event.preventDefault();
+    history.replaceState(null, "", "#/note/" + encodeURIComponent(currentSlug) + "#" + encodeURIComponent(anchor));
+  }
+
+  function scrollNoteToAnchor(anchor) {
+    const target = document.getElementById(anchor);
+    if (!target || !elements.noteContent.contains(target)) return false;
+
+    const viewRect = elements.noteView.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    elements.noteView.scrollTo({
+      top: elements.noteView.scrollTop + targetRect.top - viewRect.top - 18,
+      behavior: "auto",
+    });
+    return true;
   }
 
   function showGraph() {

@@ -524,8 +524,8 @@ function buildIndexHtml() {
             <span>Graph view</span>
           </button>
           <div class="top-actions">
-            <button id="top-graph-button" class="top-action-button" title="Open graph view" aria-label="Open graph view">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm10-5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="m9.4 9.5 5.2-3M9.7 14.1l4.8 2.8"/></svg>
+            <button id="right-sidebar-toggle" class="top-action-button active" title="Toggle right sidebar" aria-label="Toggle right sidebar" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M15 5v14"/><path d="M8 9h4M8 12h4M8 15h4"/></svg>
             </button>
           </div>
         </div>
@@ -637,6 +637,10 @@ a:hover {
   background: var(--bg);
 }
 
+.app-shell.right-pane-hidden {
+  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) 0;
+}
+
 .ribbon {
   display: flex;
   flex-direction: column;
@@ -702,6 +706,10 @@ a:hover {
   gap: 14px;
   padding: 12px;
   border-left: 1px solid var(--border-soft);
+}
+
+.app-shell.right-pane-hidden .right-pane {
+  display: none;
 }
 
 .pane-tabs,
@@ -877,6 +885,10 @@ a:hover {
 .top-action-button:hover {
   border-color: var(--border);
   background: var(--surface-3);
+  color: var(--text-bright);
+}
+
+.top-action-button.active {
   color: var(--text-bright);
 }
 
@@ -1189,7 +1201,7 @@ function buildAppJs() {
     noteTab: document.getElementById("note-tab"),
     noteTabTitle: document.getElementById("note-tab-title"),
     graphTab: document.getElementById("graph-tab"),
-    topGraphButton: document.getElementById("top-graph-button"),
+    rightSidebarToggle: document.getElementById("right-sidebar-toggle"),
     backlinkList: document.getElementById("backlink-list"),
     outgoingList: document.getElementById("outgoing-list"),
     outlineList: document.getElementById("outline-list"),
@@ -1202,6 +1214,7 @@ function buildAppJs() {
   let currentSlug = data.defaultSlug || notes[0]?.slug;
   let currentTag = null;
   let currentView = "note";
+  let rightSidebarVisible = true;
 
   renderSidebar();
   bindEvents();
@@ -1223,7 +1236,7 @@ function buildAppJs() {
     elements.search.addEventListener("input", renderSidebar);
     elements.noteTab.addEventListener("click", () => navigateNote(currentSlug));
     elements.graphTab.addEventListener("click", () => navigateGraph());
-    elements.topGraphButton.addEventListener("click", () => navigateGraph());
+    elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
 
@@ -1352,6 +1365,14 @@ function buildAppJs() {
     document.querySelectorAll(".ribbon-button").forEach((button) => {
       button.classList.toggle("active", button.dataset.route === route);
     });
+  }
+
+  function toggleRightSidebar() {
+    rightSidebarVisible = !rightSidebarVisible;
+    document.querySelector(".app-shell").classList.toggle("right-pane-hidden", !rightSidebarVisible);
+    elements.rightSidebarToggle.classList.toggle("active", rightSidebarVisible);
+    elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
+    if (currentView === "graph") requestAnimationFrame(() => graph.resize());
   }
 
   function showGraphTip(node, point) {

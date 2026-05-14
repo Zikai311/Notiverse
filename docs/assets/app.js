@@ -14,7 +14,7 @@
     noteTab: document.getElementById("note-tab"),
     noteTabTitle: document.getElementById("note-tab-title"),
     graphTab: document.getElementById("graph-tab"),
-    topGraphButton: document.getElementById("top-graph-button"),
+    rightSidebarToggle: document.getElementById("right-sidebar-toggle"),
     backlinkList: document.getElementById("backlink-list"),
     outgoingList: document.getElementById("outgoing-list"),
     outlineList: document.getElementById("outline-list"),
@@ -27,6 +27,7 @@
   let currentSlug = data.defaultSlug || notes[0]?.slug;
   let currentTag = null;
   let currentView = "note";
+  let rightSidebarVisible = true;
 
   renderSidebar();
   bindEvents();
@@ -48,7 +49,7 @@
     elements.search.addEventListener("input", renderSidebar);
     elements.noteTab.addEventListener("click", () => navigateNote(currentSlug));
     elements.graphTab.addEventListener("click", () => navigateGraph());
-    elements.topGraphButton.addEventListener("click", () => navigateGraph());
+    elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
 
@@ -177,6 +178,14 @@
     document.querySelectorAll(".ribbon-button").forEach((button) => {
       button.classList.toggle("active", button.dataset.route === route);
     });
+  }
+
+  function toggleRightSidebar() {
+    rightSidebarVisible = !rightSidebarVisible;
+    document.querySelector(".app-shell").classList.toggle("right-pane-hidden", !rightSidebarVisible);
+    elements.rightSidebarToggle.classList.toggle("active", rightSidebarVisible);
+    elements.rightSidebarToggle.setAttribute("aria-pressed", String(rightSidebarVisible));
+    if (currentView === "graph") requestAnimationFrame(() => graph.resize());
   }
 
   function showGraphTip(node, point) {

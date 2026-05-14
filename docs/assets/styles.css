@@ -64,6 +64,10 @@ a:hover {
   background: var(--bg);
 }
 
+.app-shell.right-pane-hidden {
+  grid-template-columns: 44px minmax(200px, 250px) minmax(0, 1fr) 0;
+}
+
 .ribbon {
   display: flex;
   flex-direction: column;
@@ -129,6 +133,10 @@ a:hover {
   gap: 14px;
   padding: 12px;
   border-left: 1px solid var(--border-soft);
+}
+
+.app-shell.right-pane-hidden .right-pane {
+  display: none;
 }
 
 .pane-tabs,
@@ -304,6 +312,10 @@ a:hover {
 .top-action-button:hover {
   border-color: var(--border);
   background: var(--surface-3);
+  color: var(--text-bright);
+}
+
+.top-action-button.active {
   color: var(--text-bright);
 }
 

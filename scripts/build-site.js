@@ -95,15 +95,17 @@ for (const note of notes) {
 
 const graph = buildGraph(notes, graphConfig);
 const defaultSlug = inferDefaultSlug(workspaceConfig) || notes[0]?.slug || "";
+const generatedAt = new Date().toISOString();
+const assetVersion = generatedAt.replace(/\D/g, "").slice(0, 14);
 
 fs.mkdirSync(assetsDir, { recursive: true });
 
-writeFile("index.html", buildIndexHtml());
+writeFile("index.html", buildIndexHtml(assetVersion));
 writeFile("assets/styles.css", buildStylesCss());
 writeFile("assets/app.js", buildAppJs());
 writeFile("assets/site-data.js", `window.NOTIVERSE_DATA = ${JSON.stringify(
   {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     defaultSlug,
     notes,
     tags: [...tagCounts.entries()]
@@ -475,7 +477,7 @@ function copyKatexAssets() {
   fs.cpSync(sourceFonts, targetFonts, { recursive: true });
 }
 
-function buildIndexHtml() {
+function buildIndexHtml(assetVersion) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -483,8 +485,8 @@ function buildIndexHtml() {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <title>Notiverse</title>
-    <link rel="stylesheet" href="assets/katex.min.css">
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="assets/katex.min.css?v=${assetVersion}">
+    <link rel="stylesheet" href="assets/styles.css?v=${assetVersion}">
   </head>
   <body>
     <div class="app-shell">
@@ -493,7 +495,7 @@ function buildIndexHtml() {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>
         </button>
         <button class="ribbon-button" data-route="graph" title="Graph view" aria-label="Graph view">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm10-5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="m9.4 9.5 5.2-3M9.7 14.1l4.8 2.8"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="11.5" r="3"/><circle cx="17" cy="6.5" r="3"/><circle cx="17" cy="17.5" r="3"/><path d="m9.6 10.1 4.8-2.4M9.6 12.9l4.8 2.4"/></svg>
         </button>
       </aside>
 
@@ -518,7 +520,7 @@ function buildIndexHtml() {
             <span id="note-tab-title">Note</span>
           </button>
           <button id="graph-tab" class="workspace-tab">
-            <svg class="tab-graph-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm10-5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="m9.4 9.5 5.2-3M9.7 14.1l4.8 2.8"/></svg>
+            <svg class="tab-graph-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="11.5" r="3"/><circle cx="17" cy="6.5" r="3"/><circle cx="17" cy="17.5" r="3"/><path d="m9.6 10.1 4.8-2.4M9.6 12.9l4.8 2.4"/></svg>
             <span>Graph view</span>
           </button>
           <div class="top-actions">
@@ -561,8 +563,8 @@ function buildIndexHtml() {
         </div>
       </aside>
     </div>
-    <script src="assets/site-data.js"></script>
-    <script src="assets/app.js"></script>
+    <script src="assets/site-data.js?v=${assetVersion}"></script>
+    <script src="assets/app.js?v=${assetVersion}"></script>
   </body>
 </html>
 `;

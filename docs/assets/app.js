@@ -2,12 +2,19 @@
   const data = window.NOTIVERSE_DATA;
   const notes = data.notes;
   const noteBySlug = new Map(notes.map((note) => [note.slug, note]));
+  const worlds = data.worlds;
+  const worldBySlug = new Map(worlds.map((world) => [world.slug, world]));
+  const worldByName = new Map(worlds.map((world) => [world.name, world]));
   const graphConfig = data.graphConfig;
 
   const elements = {
     fileList: document.getElementById("file-list"),
     tagList: document.getElementById("tag-list"),
     search: document.getElementById("search-input"),
+    worldButton: document.getElementById("world-button"),
+    worldName: document.getElementById("world-name"),
+    worldMenu: document.getElementById("world-menu"),
+    graphTabTitle: document.getElementById("graph-tab-title"),
     noteView: document.getElementById("note-view"),
     graphView: document.getElementById("graph-view"),
     noteContent: document.getElementById("note-content"),
@@ -24,14 +31,16 @@
     pauseGraph: document.getElementById("pause-graph"),
   };
 
-  let currentSlug = data.defaultSlug || notes[0]?.slug;
+  let currentWorld = worldBySlug.get(data.defaultWorld) || worlds[0];
+  let currentSlug = currentWorld?.defaultSlug || notes[0]?.slug;
   let currentTag = null;
   let currentView = "note";
   let rightSidebarVisible = true;
 
+  renderWorldSwitcher();
   renderSidebar();
   bindEvents();
-  const graph = createGraph(elements.canvas, data.graph, graphConfig, {
+  const graph = createGraph(elements.canvas, currentWorld?.graph, graphConfig, {
     onOpen: (slug) => navigateNote(slug),
     onHover: showGraphTip,
   });
@@ -49,6 +58,23 @@
     elements.search.addEventListener("input", renderSidebar);
     elements.noteTab.addEventListener("click", () => navigateNote(currentSlug));
     elements.graphTab.addEventListener("click", () => navigateGraph());
+    elements.worldButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleWorldMenu();
+    });
+    elements.worldMenu.addEventListener("click", (event) => {
+      const option = event.target.closest(".world-option");
+      if (!option) return;
+      closeWorldMenu();
+      if (option.dataset.world === currentWorld?.slug) return;
+      location.hash = "#/world/" + encodeURIComponent(option.dataset.world);
+    });
+    document.addEventListener("click", (event) => {
+      if (!elements.worldMenu.contains(event.target) && event.target !== elements.worldButton) closeWorldMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeWorldMenu();
+    });
     elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
@@ -65,6 +91,18 @@
 
   function routeFromHash() {
     const hash = decodeURIComponent(location.hash || "");
+    if (hash.startsWith("#/world/")) {
+      const target = worldBySlug.get(hash.slice("#/world/".length).split("#")[0]);
+      if (target) {
+        const wasGraph = currentView === "graph";
+        setWorld(target);
+        // The world route is an action, not a destination: it hands off to the
+        // graph or to the world's first note so the hash always names a view.
+        if (wasGraph) navigateGraph();
+        else navigateNote(target.defaultSlug);
+        return;
+      }
+    }
     if (hash.startsWith("#/graph")) {
       showGraph();
       return;
@@ -72,15 +110,19 @@
     if (hash.startsWith("#/tag/")) {
       currentTag = hash.slice("#/tag/".length);
       renderSidebar();
-      const first = notes.find((note) => note.tags.includes(currentTag));
+      const first = worldNotes().find((note) => note.tags.includes(currentTag));
       if (first) renderNote(first.slug);
+      else renderNote(currentSlug);
       return;
     }
     if (hash.startsWith("#/note/")) {
       const target = hash.slice("#/note/".length).split("#")[0];
+      const note = noteBySlug.get(target);
       currentTag = null;
+      // A link may point into another world; follow it and switch worlds.
+      if (note && note.world !== currentWorld?.name) setWorld(worldByName.get(note.world));
       renderSidebar();
-      renderNote(noteBySlug.has(target) ? target : currentSlug);
+      renderNote(note ? target : currentSlug);
       return;
     }
     navigateNote(currentSlug);
@@ -88,6 +130,60 @@
 
   function navigateNote(slug) {
     location.hash = "#/note/" + encodeURIComponent(slug || currentSlug);
+  }
+
+  function worldNotes() {
+    if (!currentWorld) return notes;
+    return currentWorld.noteSlugs.map((slug) => noteBySlug.get(slug)).filter(Boolean);
+  }
+
+  function setWorld(world) {
+    if (!world || world === currentWorld) return;
+    currentWorld = world;
+    currentTag = null;
+    elements.search.value = "";
+    renderWorldSwitcher();
+    renderSidebar();
+    graph.setData(world.graph);
+    if (currentView === "graph") {
+      // Staying in the graph means renderNote never runs, so point the note tab at
+      // the new world's default note instead of leaving the old world's note there.
+      const fallback = noteBySlug.get(world.defaultSlug);
+      if (fallback) {
+        currentSlug = fallback.slug;
+        elements.noteTabTitle.textContent = fallback.title;
+        elements.noteContent.innerHTML = '<h1>' + escapeHtml(fallback.title) + '</h1>' + fallback.html;
+        renderContext(fallback);
+        updateActiveStates();
+        graph.setActive(fallback.slug);
+      }
+      requestAnimationFrame(() => {
+        graph.resize();
+        graph.fit();
+      });
+    }
+  }
+
+  function renderWorldSwitcher() {
+    elements.worldName.textContent = currentWorld?.name || "Vault";
+    elements.worldButton.title = (currentWorld?.name || "Vault") + " · " + (currentWorld?.noteSlugs.length || 0) + " notes";
+    if (elements.graphTabTitle) {
+      elements.graphTabTitle.textContent = currentWorld ? "Graph view · " + currentWorld.name : "Graph view";
+    }
+    elements.worldMenu.innerHTML = worlds
+      .map((world) => '<button type="button" role="option" class="world-option' + (world === currentWorld ? " active" : "") + '" data-world="' + escapeHtml(world.slug) + '" aria-selected="' + (world === currentWorld) + '"><span class="world-option-name">' + escapeHtml(world.name) + '</span><span class="world-option-count">' + world.noteSlugs.length + '</span></button>')
+      .join("");
+  }
+
+  function toggleWorldMenu() {
+    const open = elements.worldMenu.classList.contains("hidden");
+    elements.worldMenu.classList.toggle("hidden", !open);
+    elements.worldButton.setAttribute("aria-expanded", String(open));
+  }
+
+  function closeWorldMenu() {
+    elements.worldMenu.classList.add("hidden");
+    elements.worldButton.setAttribute("aria-expanded", "false");
   }
 
   function navigateGraph() {
@@ -165,19 +261,24 @@
 
   function renderSidebar() {
     const query = elements.search.value.trim().toLowerCase();
-    const filtered = notes.filter((note) => {
+    const filtered = worldNotes().filter((note) => {
       const matchesQuery = !query || note.title.toLowerCase().includes(query) || note.excerpt.toLowerCase().includes(query);
       const matchesTag = !currentTag || note.tags.includes(currentTag);
       return matchesQuery && matchesTag;
     });
 
-    elements.fileList.innerHTML = filtered
-      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
-      .join("");
+    elements.fileList.innerHTML = filtered.length
+      ? filtered
+          .map((note) => '<a class="file-item" data-slug="' + escapeHtml(note.slug) + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
+          .join("")
+      : '<div class="context-empty">No notes</div>';
 
-    elements.tagList.innerHTML = data.tags
-      .map((tag) => '<a class="tag-pill" data-tag="' + escapeHtml(tag.name) + '" href="#/tag/' + encodeURIComponent(tag.name) + '">#' + escapeHtml(tag.name) + ' <span>' + tag.count + '</span></a>')
-      .join("");
+    const tags = currentWorld?.tags || [];
+    elements.tagList.innerHTML = tags.length
+      ? tags
+          .map((tag) => '<a class="tag-pill" data-tag="' + escapeHtml(tag.name) + '" href="#/tag/' + encodeURIComponent(tag.name) + '">#' + escapeHtml(tag.name) + ' <span>' + tag.count + '</span></a>')
+          .join("")
+      : '<div class="context-empty">No tags</div>';
 
     updateActiveStates();
   }
@@ -252,18 +353,9 @@
 
   function createGraph(canvas, sourceGraph, config, callbacks) {
     const ctx = canvas.getContext("2d");
-    const nodes = sourceGraph.nodes.map((node, index) => ({
-      ...node,
-      x: Math.cos(index * 2.399) * 180,
-      y: Math.sin(index * 2.399) * 180,
-      vx: 0,
-      vy: 0,
-      fixed: false,
-    }));
-    const byId = new Map(nodes.map((node) => [node.id, node]));
-    const links = sourceGraph.links
-      .map((link) => ({ source: byId.get(link.source), target: byId.get(link.target) }))
-      .filter((link) => link.source && link.target);
+    let nodes = [];
+    let byId = new Map();
+    let links = [];
 
     let width = 0;
     let height = 0;
@@ -278,6 +370,8 @@
     let activeId = null;
     let hovered = null;
     let resizeObserver = null;
+
+    setData(sourceGraph);
 
     requestAnimationFrame(() => {
       resize();
@@ -366,6 +460,33 @@
       const node = pickNode(eventPoint(event));
       if (node) callbacks.onOpen?.(node.id);
     });
+
+    // Swapping worlds replaces the whole node/link set rather than rebuilding the
+    // graph, so the canvas, listeners, and animation loop all survive the switch.
+    function setData(nextGraph) {
+      const source = nextGraph || { nodes: [], links: [] };
+      nodes = source.nodes.map((node, index) => ({
+        ...node,
+        x: Math.cos(index * 2.399) * 180,
+        y: Math.sin(index * 2.399) * 180,
+        vx: 0,
+        vy: 0,
+        fixed: false,
+      }));
+      byId = new Map(nodes.map((node) => [node.id, node]));
+      links = source.links
+        .map((link) => ({ source: byId.get(link.source), target: byId.get(link.target) }))
+        .filter((link) => link.source && link.target);
+      camera = { x: 0, y: 0, scale: clamp(config.scale || 1, 0.55, 2.4) };
+      alpha = 1;
+      draggingNode = null;
+      draggingCanvas = false;
+      lastPointer = null;
+      movedPointer = false;
+      hovered = null;
+      callbacks.onHover?.(null);
+      draw();
+    }
 
     function tick() {
       if (running) simulate();
@@ -571,7 +692,7 @@
       return Math.hypot(a.x - b.x, a.y - b.y);
     }
 
-    return { resize, fit, warm, togglePause, setActive, nodeScreenPositions };
+    return { resize, fit, warm, togglePause, setActive, setData, nodeScreenPositions };
   }
 
   function clamp(value, min, max) {

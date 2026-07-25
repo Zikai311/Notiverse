@@ -1532,6 +1532,7 @@ function buildAppJs() {
     worldButton: document.getElementById("world-button"),
     worldName: document.getElementById("world-name"),
     worldMenu: document.getElementById("world-menu"),
+    graphTabTitle: document.getElementById("graph-tab-title"),
     noteView: document.getElementById("note-view"),
     graphView: document.getElementById("graph-view"),
     noteContent: document.getElementById("note-content"),
@@ -1583,6 +1584,7 @@ function buildAppJs() {
       const option = event.target.closest(".world-option");
       if (!option) return;
       closeWorldMenu();
+      if (option.dataset.world === currentWorld?.slug) return;
       location.hash = "#/world/" + encodeURIComponent(option.dataset.world);
     });
     document.addEventListener("click", (event) => {
@@ -1610,8 +1612,12 @@ function buildAppJs() {
     if (hash.startsWith("#/world/")) {
       const target = worldBySlug.get(hash.slice("#/world/".length).split("#")[0]);
       if (target) {
+        const wasGraph = currentView === "graph";
         setWorld(target);
-        navigateNote(target.defaultSlug);
+        // The world route is an action, not a destination: it hands off to the
+        // graph or to the world's first note so the hash always names a view.
+        if (wasGraph) navigateGraph();
+        else navigateNote(target.defaultSlug);
         return;
       }
     }
@@ -1655,8 +1661,20 @@ function buildAppJs() {
     currentTag = null;
     elements.search.value = "";
     renderWorldSwitcher();
+    renderSidebar();
     graph.setData(world.graph);
     if (currentView === "graph") {
+      // Staying in the graph means renderNote never runs, so point the note tab at
+      // the new world's default note instead of leaving the old world's note there.
+      const fallback = noteBySlug.get(world.defaultSlug);
+      if (fallback) {
+        currentSlug = fallback.slug;
+        elements.noteTabTitle.textContent = fallback.title;
+        elements.noteContent.innerHTML = '<h1>' + escapeHtml(fallback.title) + '</h1>' + fallback.html;
+        renderContext(fallback);
+        updateActiveStates();
+        graph.setActive(fallback.slug);
+      }
       requestAnimationFrame(() => {
         graph.resize();
         graph.fit();
@@ -1667,6 +1685,9 @@ function buildAppJs() {
   function renderWorldSwitcher() {
     elements.worldName.textContent = currentWorld?.name || "Vault";
     elements.worldButton.title = (currentWorld?.name || "Vault") + " · " + (currentWorld?.noteSlugs.length || 0) + " notes";
+    if (elements.graphTabTitle) {
+      elements.graphTabTitle.textContent = currentWorld ? "Graph view · " + currentWorld.name : "Graph view";
+    }
     elements.worldMenu.innerHTML = worlds
       .map((world) => '<button type="button" role="option" class="world-option' + (world === currentWorld ? " active" : "") + '" data-world="' + escapeHtml(world.slug) + '" aria-selected="' + (world === currentWorld) + '"><span class="world-option-name">' + escapeHtml(world.name) + '</span><span class="world-option-count">' + world.noteSlugs.length + '</span></button>')
       .join("");
@@ -1850,18 +1871,9 @@ function buildAppJs() {
 
   function createGraph(canvas, sourceGraph, config, callbacks) {
     const ctx = canvas.getContext("2d");
-    const nodes = sourceGraph.nodes.map((node, index) => ({
-      ...node,
-      x: Math.cos(index * 2.399) * 180,
-      y: Math.sin(index * 2.399) * 180,
-      vx: 0,
-      vy: 0,
-      fixed: false,
-    }));
-    const byId = new Map(nodes.map((node) => [node.id, node]));
-    const links = sourceGraph.links
-      .map((link) => ({ source: byId.get(link.source), target: byId.get(link.target) }))
-      .filter((link) => link.source && link.target);
+    let nodes = [];
+    let byId = new Map();
+    let links = [];
 
     let width = 0;
     let height = 0;
@@ -1876,6 +1888,8 @@ function buildAppJs() {
     let activeId = null;
     let hovered = null;
     let resizeObserver = null;
+
+    setData(sourceGraph);
 
     requestAnimationFrame(() => {
       resize();
@@ -1964,6 +1978,33 @@ function buildAppJs() {
       const node = pickNode(eventPoint(event));
       if (node) callbacks.onOpen?.(node.id);
     });
+
+    // Swapping worlds replaces the whole node/link set rather than rebuilding the
+    // graph, so the canvas, listeners, and animation loop all survive the switch.
+    function setData(nextGraph) {
+      const source = nextGraph || { nodes: [], links: [] };
+      nodes = source.nodes.map((node, index) => ({
+        ...node,
+        x: Math.cos(index * 2.399) * 180,
+        y: Math.sin(index * 2.399) * 180,
+        vx: 0,
+        vy: 0,
+        fixed: false,
+      }));
+      byId = new Map(nodes.map((node) => [node.id, node]));
+      links = source.links
+        .map((link) => ({ source: byId.get(link.source), target: byId.get(link.target) }))
+        .filter((link) => link.source && link.target);
+      camera = { x: 0, y: 0, scale: clamp(config.scale || 1, 0.55, 2.4) };
+      alpha = 1;
+      draggingNode = null;
+      draggingCanvas = false;
+      lastPointer = null;
+      movedPointer = false;
+      hovered = null;
+      callbacks.onHover?.(null);
+      draw();
+    }
 
     function tick() {
       if (running) simulate();
@@ -2169,7 +2210,7 @@ function buildAppJs() {
       return Math.hypot(a.x - b.x, a.y - b.y);
     }
 
-    return { resize, fit, warm, togglePause, setActive, nodeScreenPositions };
+    return { resize, fit, warm, togglePause, setActive, setData, nodeScreenPositions };
   }
 
   function clamp(value, min, max) {

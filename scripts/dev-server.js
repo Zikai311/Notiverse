@@ -49,8 +49,9 @@ server.listen(port, () => {
   console.log(`Notiverse dev server: http://localhost:${port}`);
 });
 
+// Recursive so that edits inside `*.world/` folders (where every note now lives)
+// and inside `.obsidian/` trigger a rebuild.
 watch(root);
-watch(path.join(root, ".obsidian"));
 
 function resolveRequestPath(pathname) {
   const safePath = decodeURIComponent(pathname)
@@ -77,7 +78,7 @@ function contentType(file) {
 }
 
 function watch(dir) {
-  fs.watch(dir, { recursive: false }, (event, filename) => {
+  fs.watch(dir, { recursive: true }, (event, filename) => {
     if (!filename || shouldIgnore(filename)) return;
     scheduleBuild();
   });

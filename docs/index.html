@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <title>Notiverse</title>
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=7582ac886cda">
-    <link rel="stylesheet" href="assets/katex.min.css?v=7582ac886cda">
-    <link rel="stylesheet" href="assets/styles.css?v=7582ac886cda">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=cd273c05d61e">
+    <link rel="stylesheet" href="assets/katex.min.css?v=cd273c05d61e">
+    <link rel="stylesheet" href="assets/styles.css?v=cd273c05d61e">
   </head>
   <body>
     <div class="app-shell">
@@ -21,6 +21,14 @@
       </aside>
 
       <aside class="left-pane" aria-label="Vault navigation">
+        <div class="world-switcher">
+          <button id="world-button" class="world-button" aria-haspopup="listbox" aria-expanded="false">
+            <svg class="world-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></svg>
+            <span id="world-name" class="world-name">World</span>
+            <svg class="world-caret" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg>
+          </button>
+          <div id="world-menu" class="world-menu hidden" role="listbox" aria-label="Worlds"></div>
+        </div>
         <label class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <input id="search-input" type="search" placeholder="Search notes">
@@ -39,7 +47,7 @@
           </button>
           <button id="graph-tab" class="workspace-tab">
             <svg class="tab-graph-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="11.5" r="3"/><circle cx="17" cy="6.5" r="3"/><circle cx="17" cy="17.5" r="3"/><path d="m9.6 10.1 4.8-2.4M9.6 12.9l4.8 2.4"/></svg>
-            <span>Graph view</span>
+            <span id="graph-tab-title">Graph view</span>
           </button>
           <div class="top-actions">
             <button id="right-sidebar-toggle" class="top-action-button active" title="Toggle right sidebar" aria-label="Toggle right sidebar" aria-pressed="true">
@@ -81,7 +89,7 @@
         </div>
       </aside>
     </div>
-    <script src="assets/site-data.js?v=7582ac886cda"></script>
-    <script src="assets/app.js?v=7582ac886cda"></script>
+    <script src="assets/site-data.js?v=cd273c05d61e"></script>
+    <script src="assets/app.js?v=cd273c05d61e"></script>
   </body>
 </html>

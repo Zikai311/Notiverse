@@ -10,13 +10,28 @@ const docsDir = path.join(root, "docs");
 const assetsDir = path.join(docsDir, "assets");
 const vaultConfigDir = path.join(root, ".obsidian");
 
-const noteFiles = fs
-  .readdirSync(root)
-  .filter((file) => file.endsWith(".md"))
+const WORLD_SUFFIX = ".world";
+
+const worldDirs = fs
+  .readdirSync(root, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name.endsWith(WORLD_SUFFIX))
+  .map((entry) => entry.name)
   .sort((a, b) => a.localeCompare(b));
 
+// Only *.world folders are published. With no world folder present the vault
+// root is treated as a single implicit world so the build still produces a site.
+const worldSources = worldDirs.length
+  ? worldDirs.map((dir) => ({ dir, name: dir.slice(0, -WORLD_SUFFIX.length) }))
+  : [{ dir: "", name: "Vault" }];
+
+const noteFiles = worldSources.flatMap((world) =>
+  collectMarkdown(path.join(root, world.dir))
+    .map((file) => path.relative(root, file))
+    .sort((a, b) => a.localeCompare(b))
+    .map((file) => ({ file, world: world.name, worldDir: world.dir })),
+);
+
 const graphConfig = readJson(path.join(vaultConfigDir, "graph.json"), {});
-const workspaceConfig = readJson(path.join(vaultConfigDir, "workspace.json"), {});
 
 const md = new MarkdownIt({
   html: true,
@@ -28,36 +43,53 @@ installMathRule(md);
 installHeadingAnchors(md);
 md.use(markdownItFootnote);
 
+// Slugs live in one flat namespace because routes are `#/note/<slug>`. Two notes
+// in different worlds may legitimately share a title, so collisions get a short
+// deterministic suffix derived from the source path.
 const fileToSlug = new Map();
-const titleToSlug = new Map();
+const slugToFile = new Map();
+const titleIndex = new Map();
+const usedWorldSlugs = new Set();
 
-for (const file of noteFiles) {
-  const title = basename(file);
-  const slug = slugify(title);
-  fileToSlug.set(file, slug);
-  titleToSlug.set(title.toLowerCase(), slug);
+// Per-note render state, set by renderNoteHtml and read by the markdown-it rules.
+let renderContext = null;
+
+for (const entry of noteFiles) {
+  const title = basename(entry.file);
+  const slug = uniqueSlug(slugify(title), entry.file);
+  entry.title = title;
+  entry.slug = slug;
+  fileToSlug.set(entry.file, slug);
+  slugToFile.set(slug, entry.file);
+
+  const key = title.toLowerCase();
+  if (!titleIndex.has(key)) titleIndex.set(key, []);
+  titleIndex.get(key).push({ slug, title, world: entry.world });
 }
 
-const rawNotes = noteFiles.map((file) => {
-  const markdown = fs.readFileSync(path.join(root, file), "utf8");
-  const title = basename(file);
-  const slug = fileToSlug.get(file);
-  const links = collectWikiLinks(markdown);
-  const tags = collectTags(markdown);
-  const headings = collectHeadings(markdown);
-  const excerpt = collectExcerpt(markdown);
+// Two-pass render: the first pass only exists to learn each note's heading ids
+// so that `[[Note#Heading]]` links in the second pass can resolve against them.
+const headingsBySlug = new Map();
+const unresolved = [];
 
-  return {
-    file,
-    title,
-    slug,
-    markdown,
-    links,
-    tags,
-    headings,
-    excerpt,
-  };
-});
+for (const entry of noteFiles) {
+  entry.markdown = fs.readFileSync(path.join(root, entry.file), "utf8");
+  renderNoteHtml(entry, { collectOnly: true });
+}
+
+const rawNotes = noteFiles.map((entry) => ({
+  file: entry.file,
+  world: entry.world,
+  worldDir: entry.worldDir,
+  title: entry.title,
+  slug: entry.slug,
+  markdown: entry.markdown,
+  links: collectLinks(entry),
+  tags: collectTags(entry.markdown),
+  excerpt: collectExcerpt(entry.markdown),
+}));
+
+const worldOfSlug = new Map(rawNotes.map((note) => [note.slug, note.world]));
 
 const backlinks = new Map(rawNotes.map((note) => [note.slug, []]));
 for (const note of rawNotes) {
@@ -66,47 +98,61 @@ for (const note of rawNotes) {
     backlinks.get(target.slug).push({
       slug: note.slug,
       title: note.title,
+      world: note.world,
     });
   }
 }
 
 const notes = rawNotes.map((note) => {
-  const prepared = prepareMarkdown(note.markdown);
-  const html = md.render(prepared);
+  const html = renderNoteHtml(note, { collectOnly: false });
 
   return {
     file: note.file,
+    world: note.world,
     title: note.title,
     slug: note.slug,
     tags: note.tags,
-    headings: note.headings,
+    headings: headingsBySlug.get(note.slug) || [],
     excerpt: note.excerpt,
-    links: note.links,
+    links: note.links.map((link) => ({ ...link, world: worldOfSlug.get(link.slug) })),
     backlinks: backlinks.get(note.slug) || [],
     html,
   };
 });
 
-const tagCounts = new Map();
-for (const note of notes) {
-  for (const tag of note.tags) {
-    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+// Each world owns its own note list, tag cloud, and graph. Notes stay in one flat
+// array on the client so cross-world links can still resolve by slug.
+const worlds = worldSources.map((source) => {
+  const worldNotes = notes.filter((note) => note.world === source.name);
+  const tagCounts = new Map();
+  for (const note of worldNotes) {
+    for (const tag of note.tags) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
   }
+
+  return {
+    name: source.name,
+    slug: uniqueWorldSlug(slugify(source.name)),
+    dir: source.dir,
+    noteSlugs: worldNotes.map((note) => note.slug),
+    defaultSlug: worldNotes[0]?.slug || "",
+    tags: [...tagCounts.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
+    graph: buildGraph(worldNotes, graphConfig),
+  };
+});
+
+if (unresolved.length) {
+  console.warn(`\n${unresolved.length} unresolved link(s):`);
+  for (const item of unresolved) console.warn(`  ${item.file}: ${item.target}`);
+  console.warn("");
 }
 
-const graph = buildGraph(notes, graphConfig);
-const defaultSlug = inferDefaultSlug(workspaceConfig) || notes[0]?.slug || "";
 const siteData = {
-  defaultSlug,
+  worlds,
+  defaultWorld: worlds[0]?.slug || "",
   notes,
-  tags: [...tagCounts.entries()]
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
-  graph,
   graphConfig: normalizeGraphConfig(graphConfig),
-  workspace: {
-    lastOpenFiles: workspaceConfig.lastOpenFiles || [],
-  },
 };
 const stylesCss = buildStylesCss();
 const appJs = buildAppJs();
@@ -125,7 +171,8 @@ writeFile(".nojekyll", "");
 
 copyKatexAssets();
 
-console.log(`Built ${notes.length} notes into ${path.relative(root, docsDir)}`);
+const worldSummary = worlds.map((world) => `${world.name} (${world.noteSlugs.length})`).join(", ");
+console.log(`Built ${notes.length} notes across ${worlds.length} world(s) into ${path.relative(root, docsDir)}: ${worldSummary}`);
 
 function readJson(file, fallback) {
   try {
@@ -139,38 +186,120 @@ function basename(file) {
   return path.basename(file, ".md");
 }
 
+// Keeps Unicode letters and digits, so CJK titles and headings stay distinguishable.
+// Stripping down to ASCII used to collapse most Chinese headings onto one id.
 function slugify(text) {
   return text
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFC")
     .toLowerCase()
     .replace(/×/g, "x")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .replace(/-{2,}/g, "-") || "note";
+    .replace(/['’]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "") || "note";
 }
 
-function collectWikiLinks(markdown) {
+function uniqueSlug(base, file) {
+  if (!slugToFile.has(base)) return base;
+  const suffix = contentHash(file).slice(0, 4);
+  let candidate = `${base}-${suffix}`;
+  let counter = 2;
+  while (slugToFile.has(candidate)) {
+    candidate = `${base}-${suffix}-${counter}`;
+    counter += 1;
+  }
+  return candidate;
+}
+
+function uniqueWorldSlug(base) {
+  let candidate = base;
+  let counter = 2;
+  while (usedWorldSlugs.has(candidate)) {
+    candidate = `${base}-${counter}`;
+    counter += 1;
+  }
+  usedWorldSlugs.add(candidate);
+  return candidate;
+}
+
+function collectMarkdown(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
+      // A nested *.world folder belongs to its own world, not this one.
+      if (entry.name.endsWith(WORLD_SUFFIX)) continue;
+      files.push(...collectMarkdown(full));
+      continue;
+    }
+    if (entry.isFile() && entry.name.endsWith(".md")) files.push(full);
+  }
+  return files;
+}
+
+// Wikilinks and relative *.md links both become graph edges. Both are resolved
+// against the note's own world first, so two worlds can reuse a note title.
+function collectLinks(entry) {
   const links = [];
   const seen = new Set();
+
+  const push = (slug, title, heading) => {
+    if (!slug || slug === entry.slug || seen.has(slug)) return;
+    seen.add(slug);
+    links.push({ slug, title, heading: heading || "" });
+  };
+
   const wikiLink = /!?\[\[([^\]]+)\]\]/g;
   let match;
+  while ((match = wikiLink.exec(entry.markdown))) {
+    const target = parseWikiTarget(match[1]);
+    if (!target.title) continue;
+    push(resolveTitle(target.title, entry.world), target.title, target.heading);
+  }
 
-  while ((match = wikiLink.exec(markdown))) {
-    const rawTarget = match[1].split("|")[0].trim();
-    const [rawPage, rawHeading = ""] = rawTarget.split("#");
-    const targetTitle = rawPage.trim();
-    const slug = titleToSlug.get(targetTitle.toLowerCase());
-    if (!slug || seen.has(slug)) continue;
-    seen.add(slug);
-    links.push({
-      slug,
-      title: targetTitle,
-      heading: rawHeading.trim(),
-    });
+  const mdLink = /\[[^\]]*\]\(([^)\s]+\.md)(#[^)\s]*)?\)/g;
+  while ((match = mdLink.exec(entry.markdown))) {
+    const resolved = resolveRelativeMd(match[1], entry);
+    if (resolved) push(resolved.slug, resolved.title, "");
   }
 
   return links;
+}
+
+function parseWikiTarget(body) {
+  const rawTarget = body.split("|")[0].trim();
+  const hashIndex = rawTarget.indexOf("#");
+  if (hashIndex === 0) return { title: "", heading: rawTarget.slice(1).trim() };
+  if (hashIndex < 0) return { title: rawTarget, heading: "" };
+  return {
+    title: rawTarget.slice(0, hashIndex).trim(),
+    heading: rawTarget.slice(hashIndex + 1).trim(),
+  };
+}
+
+// Prefer a note in the same world; fall back to a unique match anywhere.
+function resolveTitle(title, world) {
+  const candidates = titleIndex.get(title.trim().toLowerCase());
+  if (!candidates || !candidates.length) return null;
+  const sameWorld = candidates.find((candidate) => candidate.world === world);
+  return (sameWorld || candidates[0]).slug;
+}
+
+function resolveRelativeMd(href, entry) {
+  let decoded = href;
+  try {
+    decoded = decodeURIComponent(href);
+  } catch {
+    // Leave the raw href alone if it is not valid percent-encoding.
+  }
+  if (/^[a-z][a-z0-9+.-]*:/i.test(decoded) || decoded.startsWith("/")) return null;
+
+  const target = path.normalize(path.join(path.dirname(entry.file), decoded));
+  const slug = fileToSlug.get(target);
+  if (!slug) return null;
+  return { slug, title: basename(target) };
 }
 
 function collectTags(markdown) {
@@ -185,20 +314,29 @@ function collectTags(markdown) {
   return [...tags].sort((a, b) => a.localeCompare(b));
 }
 
-function collectHeadings(markdown) {
-  const headings = [];
-  const lines = markdown.split(/\r?\n/);
-  for (const line of lines) {
-    const match = /^(#{1,4})\s+(.+?)\s*$/.exec(line);
-    if (!match) continue;
-    const text = stripMarkdown(match[2]);
-    headings.push({
-      level: match[1].length,
-      text,
-      id: headingId(text),
-    });
-  }
-  return headings;
+// Heading ids are allocated by the renderer, and the outline is collected from the
+// same pass. That keeps `id` attributes and outline links in lockstep even when a
+// heading contains math or markup that a separate text-stripping pass would mangle.
+function renderNoteHtml(entry, { collectOnly }) {
+  renderContext = {
+    note: entry,
+    usedIds: new Map(),
+    headings: [],
+    inCallout: false,
+  };
+
+  const html = md.render(prepareMarkdown(entry.markdown, entry));
+  headingsBySlug.set(entry.slug, renderContext.headings);
+  renderContext = null;
+  return collectOnly ? "" : html;
+}
+
+function allocateHeadingId(text) {
+  const base = slugify(text);
+  if (!renderContext) return base;
+  const seen = renderContext.usedIds.get(base) || 0;
+  renderContext.usedIds.set(base, seen + 1);
+  return seen === 0 ? base : `${base}-${seen + 1}`;
 }
 
 function collectExcerpt(markdown) {
@@ -222,21 +360,57 @@ function stripMarkdown(input) {
     .trim();
 }
 
-function prepareMarkdown(markdown) {
+function prepareMarkdown(markdown, entry) {
   return normalizeDisplayMath(transformCallouts(markdown))
     .replace(/!?\[\[([^\]]+)\]\]/g, (_, body) => {
-      const [target, alias] = body.split("|");
-      const [page, heading] = target.split("#");
-      const title = page.trim();
-      const slug = titleToSlug.get(title.toLowerCase());
+      const alias = body.includes("|") ? body.slice(body.indexOf("|") + 1).trim() : "";
+      const { title, heading } = parseWikiTarget(body);
       const label = (alias || heading || title).trim();
-      if (!slug) return `<span class="missing-link">${escapeHtml(label)}</span>`;
-      const hash = heading ? `#${headingId(heading.trim())}` : "";
-      return `<a class="internal-link" href="#/note/${slug}${hash}">${escapeHtml(label)}</a>`;
+
+      // `[[#Heading]]` is a link inside the current note.
+      if (!title) {
+        return `<a class="internal-link" href="#${encodeURIComponent(noteHeadingId(entry, heading))}">${escapeHtml(label)}</a>`;
+      }
+
+      const slug = resolveTitle(title, entry.world);
+      if (!slug) {
+        recordUnresolved(entry, `[[${body}]]`);
+        return `<span class="missing-link">${escapeHtml(label)}</span>`;
+      }
+      const hash = heading ? `#${encodeURIComponent(noteHeadingId(slug, heading))}` : "";
+      return `<a class="internal-link" href="#/note/${encodeURIComponent(slug)}${hash}">${escapeHtml(label)}</a>`;
+    })
+    // Relative *.md links (used by the Math I table of contents) point at vault
+    // files, which do not exist on the site. Rewrite them into hash routes.
+    .replace(/\[([^\]]*)\]\(([^)\s]+\.md)(#[^)\s]*)?\)/g, (whole, label, href, hash) => {
+      const resolved = resolveRelativeMd(href, entry);
+      if (!resolved) {
+        recordUnresolved(entry, href);
+        return `<span class="missing-link">${escapeHtml(label || href)}</span>`;
+      }
+      const anchor = hash ? `#${encodeURIComponent(noteHeadingId(resolved.slug, hash.slice(1)))}` : "";
+      return `<a class="internal-link" href="#/note/${encodeURIComponent(resolved.slug)}${anchor}">${escapeHtml(label || resolved.title)}</a>`;
     })
     .replace(/(^|\s)#([A-Za-z0-9_/-]+)/g, (_, prefix, tag) => {
       return `${prefix}<a class="tag-link" href="#/tag/${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`;
     });
+}
+
+// Resolve a heading reference against the ids the target note actually produced.
+// Falls back to a plain slug when the target has not been rendered yet.
+function noteHeadingId(slugOrEntry, heading) {
+  const text = String(heading || "").trim();
+  if (!text) return "";
+  const slug = typeof slugOrEntry === "string" ? slugOrEntry : slugOrEntry?.slug;
+  const headings = headingsBySlug.get(slug);
+  const target = headings?.find((item) => item.text.toLowerCase() === text.toLowerCase());
+  return target ? target.id : slugify(text);
+}
+
+function recordUnresolved(entry, target) {
+  if (!entry) return;
+  if (unresolved.some((item) => item.file === entry.file && item.target === target)) return;
+  unresolved.push({ file: entry.file, target });
 }
 
 function normalizeDisplayMath(markdown) {
@@ -258,7 +432,14 @@ function transformCallouts(markdown) {
     output.push("");
     output.push(`<div class="callout callout-${escapeHtml(callout.type)}">`);
     output.push(`<div class="callout-title">${escapeHtml(callout.title)}</div>`);
-    if (body) output.push(md.render(body));
+    if (body) {
+      // This nested render happens before the main pass, so its headings must not
+      // land in the outline; ids are still allocated to keep them unique.
+      const outer = renderContext?.inCallout;
+      if (renderContext) renderContext.inCallout = true;
+      output.push(md.render(body));
+      if (renderContext) renderContext.inCallout = outer;
+    }
     output.push("</div>");
     output.push("");
     callout = null;
@@ -344,12 +525,33 @@ function installHeadingAnchors(markdownIt) {
   markdownIt.renderer.rules.heading_open = (tokens, idx) => {
     const token = tokens[idx];
     const inline = tokens[idx + 1];
-    const text = inline?.children
-      ?.filter((child) => child.type === "text" || child.type === "code_inline")
-      .map((child) => child.content)
-      .join("") || inline?.content || "";
-    return `<${token.tag} id="${headingId(text)}">`;
+    const text = headingText(inline);
+    const id = allocateHeadingId(text);
+
+    if (renderContext && !renderContext.inCallout) {
+      const level = Number(token.tag.slice(1)) || 1;
+      if (level <= 4) renderContext.headings.push({ level, text, id });
+    }
+
+    return `<${token.tag} id="${id}">`;
   };
+}
+
+// Heading text for ids and the outline. Math and links keep their source text so a
+// heading like `### 一个经典的洞：$\\sqrt{2}$` still yields a distinguishable id.
+function headingText(inline) {
+  if (!inline) return "";
+  if (!inline.children?.length) return inline.content || "";
+  return inline.children
+    .map((child) => {
+      if (child.type === "text" || child.type === "code_inline") return child.content;
+      if (child.type === "math_inline") return child.content;
+      if (child.type === "html_inline") return "";
+      return "";
+    })
+    .join("")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function renderMath(source, displayMode) {
@@ -365,25 +567,35 @@ function renderMath(source, displayMode) {
   }
 }
 
-function buildGraph(notes, config) {
+// One graph per world: only notes in that world become nodes, and an edge is kept
+// only when both endpoints live in the world. Cross-world links still work as
+// links, they just do not draw an edge into a graph that lacks the other node.
+function buildGraph(worldNotes, config) {
   const colorGroups = normalizeColorGroups(config.colorGroups || []);
-  const nodes = notes.map((note) => {
+  const inWorld = new Set(worldNotes.map((note) => note.slug));
+
+  const nodes = worldNotes.map((note) => {
     const color = pickNodeColor(note, colorGroups);
+    const degree =
+      note.links.filter((link) => inWorld.has(link.slug)).length +
+      note.backlinks.filter((link) => inWorld.has(link.slug)).length;
     return {
       id: note.slug,
       title: note.title,
       file: note.file,
+      world: note.world,
       tags: note.tags,
       color,
-      radius: 6 + Math.min(7, note.links.length + note.backlinks.length),
+      radius: 6 + Math.min(7, degree),
       type: note.tags[0] || "note",
     };
   });
 
   const links = [];
   const seen = new Set();
-  for (const note of notes) {
+  for (const note of worldNotes) {
     for (const link of note.links) {
+      if (!inWorld.has(link.slug)) continue;
       const key = [note.slug, link.slug].sort().join("::");
       if (seen.has(key)) continue;
       seen.add(key);
@@ -436,21 +648,6 @@ function pickNodeColor(note, colorGroups) {
 
 function rgbIntToHex(value) {
   return `#${Number(value).toString(16).padStart(6, "0").slice(-6)}`;
-}
-
-function inferDefaultSlug(workspace) {
-  const activeFile = workspace?.main?.children?.[0]?.children?.[0]?.state?.state?.file;
-  if (activeFile && fileToSlug.has(activeFile)) return fileToSlug.get(activeFile);
-
-  for (const file of workspace.lastOpenFiles || []) {
-    if (fileToSlug.has(file)) return fileToSlug.get(file);
-  }
-
-  return null;
-}
-
-function headingId(text) {
-  return slugify(text);
 }
 
 function escapeHtml(value) {
@@ -508,6 +705,14 @@ function buildIndexHtml(assetVersion) {
       </aside>
 
       <aside class="left-pane" aria-label="Vault navigation">
+        <div class="world-switcher">
+          <button id="world-button" class="world-button" aria-haspopup="listbox" aria-expanded="false">
+            <svg class="world-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></svg>
+            <span id="world-name" class="world-name">World</span>
+            <svg class="world-caret" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg>
+          </button>
+          <div id="world-menu" class="world-menu hidden" role="listbox" aria-label="Worlds"></div>
+        </div>
         <label class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <input id="search-input" type="search" placeholder="Search notes">
@@ -526,7 +731,7 @@ function buildIndexHtml(assetVersion) {
           </button>
           <button id="graph-tab" class="workspace-tab">
             <svg class="tab-graph-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="11.5" r="3"/><circle cx="17" cy="6.5" r="3"/><circle cx="17" cy="17.5" r="3"/><path d="m9.6 10.1 4.8-2.4M9.6 12.9l4.8 2.4"/></svg>
-            <span>Graph view</span>
+            <span id="graph-tab-title">Graph view</span>
           </button>
           <div class="top-actions">
             <button id="right-sidebar-toggle" class="top-action-button active" title="Toggle right sidebar" aria-label="Toggle right sidebar" aria-pressed="true">
@@ -749,11 +954,117 @@ a:hover {
   color: var(--text-bright);
 }
 
+.world-switcher {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 12px 12px 8px;
+}
+
+.world-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #1b1624;
+  color: var(--text-bright);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 120ms ease-out, border-color 120ms ease-out;
+}
+
+.world-button:hover,
+.world-button[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: var(--surface-3);
+}
+
+.world-icon {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  color: var(--accent-2);
+}
+
+.world-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.world-caret {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  color: var(--muted);
+}
+
+.world-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  overflow: hidden auto;
+  max-height: 264px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface-2);
+  box-shadow: 0 12px 26px -12px var(--shadow);
+}
+
+.world-option {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.world-option:hover {
+  background: var(--surface-3);
+}
+
+.world-option.active {
+  color: var(--text-bright);
+  background: var(--surface-3);
+}
+
+.world-option-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.world-option-count {
+  flex: 0 0 auto;
+  color: var(--faint);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
 .search-box {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 12px;
+  margin: 0 12px 12px;
   padding: 6px 9px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1209,12 +1520,18 @@ function buildAppJs() {
   const data = window.NOTIVERSE_DATA;
   const notes = data.notes;
   const noteBySlug = new Map(notes.map((note) => [note.slug, note]));
+  const worlds = data.worlds;
+  const worldBySlug = new Map(worlds.map((world) => [world.slug, world]));
+  const worldByName = new Map(worlds.map((world) => [world.name, world]));
   const graphConfig = data.graphConfig;
 
   const elements = {
     fileList: document.getElementById("file-list"),
     tagList: document.getElementById("tag-list"),
     search: document.getElementById("search-input"),
+    worldButton: document.getElementById("world-button"),
+    worldName: document.getElementById("world-name"),
+    worldMenu: document.getElementById("world-menu"),
     noteView: document.getElementById("note-view"),
     graphView: document.getElementById("graph-view"),
     noteContent: document.getElementById("note-content"),
@@ -1231,14 +1548,16 @@ function buildAppJs() {
     pauseGraph: document.getElementById("pause-graph"),
   };
 
-  let currentSlug = data.defaultSlug || notes[0]?.slug;
+  let currentWorld = worldBySlug.get(data.defaultWorld) || worlds[0];
+  let currentSlug = currentWorld?.defaultSlug || notes[0]?.slug;
   let currentTag = null;
   let currentView = "note";
   let rightSidebarVisible = true;
 
+  renderWorldSwitcher();
   renderSidebar();
   bindEvents();
-  const graph = createGraph(elements.canvas, data.graph, graphConfig, {
+  const graph = createGraph(elements.canvas, currentWorld?.graph, graphConfig, {
     onOpen: (slug) => navigateNote(slug),
     onHover: showGraphTip,
   });
@@ -1256,6 +1575,22 @@ function buildAppJs() {
     elements.search.addEventListener("input", renderSidebar);
     elements.noteTab.addEventListener("click", () => navigateNote(currentSlug));
     elements.graphTab.addEventListener("click", () => navigateGraph());
+    elements.worldButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleWorldMenu();
+    });
+    elements.worldMenu.addEventListener("click", (event) => {
+      const option = event.target.closest(".world-option");
+      if (!option) return;
+      closeWorldMenu();
+      location.hash = "#/world/" + encodeURIComponent(option.dataset.world);
+    });
+    document.addEventListener("click", (event) => {
+      if (!elements.worldMenu.contains(event.target) && event.target !== elements.worldButton) closeWorldMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeWorldMenu();
+    });
     elements.rightSidebarToggle.addEventListener("click", toggleRightSidebar);
     elements.fitGraph.addEventListener("click", () => graph.fit());
     elements.pauseGraph.addEventListener("click", () => graph.togglePause());
@@ -1272,6 +1607,14 @@ function buildAppJs() {
 
   function routeFromHash() {
     const hash = decodeURIComponent(location.hash || "");
+    if (hash.startsWith("#/world/")) {
+      const target = worldBySlug.get(hash.slice("#/world/".length).split("#")[0]);
+      if (target) {
+        setWorld(target);
+        navigateNote(target.defaultSlug);
+        return;
+      }
+    }
     if (hash.startsWith("#/graph")) {
       showGraph();
       return;
@@ -1279,15 +1622,19 @@ function buildAppJs() {
     if (hash.startsWith("#/tag/")) {
       currentTag = hash.slice("#/tag/".length);
       renderSidebar();
-      const first = notes.find((note) => note.tags.includes(currentTag));
+      const first = worldNotes().find((note) => note.tags.includes(currentTag));
       if (first) renderNote(first.slug);
+      else renderNote(currentSlug);
       return;
     }
     if (hash.startsWith("#/note/")) {
       const target = hash.slice("#/note/".length).split("#")[0];
+      const note = noteBySlug.get(target);
       currentTag = null;
+      // A link may point into another world; follow it and switch worlds.
+      if (note && note.world !== currentWorld?.name) setWorld(worldByName.get(note.world));
       renderSidebar();
-      renderNote(noteBySlug.has(target) ? target : currentSlug);
+      renderNote(note ? target : currentSlug);
       return;
     }
     navigateNote(currentSlug);
@@ -1295,6 +1642,45 @@ function buildAppJs() {
 
   function navigateNote(slug) {
     location.hash = "#/note/" + encodeURIComponent(slug || currentSlug);
+  }
+
+  function worldNotes() {
+    if (!currentWorld) return notes;
+    return currentWorld.noteSlugs.map((slug) => noteBySlug.get(slug)).filter(Boolean);
+  }
+
+  function setWorld(world) {
+    if (!world || world === currentWorld) return;
+    currentWorld = world;
+    currentTag = null;
+    elements.search.value = "";
+    renderWorldSwitcher();
+    graph.setData(world.graph);
+    if (currentView === "graph") {
+      requestAnimationFrame(() => {
+        graph.resize();
+        graph.fit();
+      });
+    }
+  }
+
+  function renderWorldSwitcher() {
+    elements.worldName.textContent = currentWorld?.name || "Vault";
+    elements.worldButton.title = (currentWorld?.name || "Vault") + " · " + (currentWorld?.noteSlugs.length || 0) + " notes";
+    elements.worldMenu.innerHTML = worlds
+      .map((world) => '<button type="button" role="option" class="world-option' + (world === currentWorld ? " active" : "") + '" data-world="' + escapeHtml(world.slug) + '" aria-selected="' + (world === currentWorld) + '"><span class="world-option-name">' + escapeHtml(world.name) + '</span><span class="world-option-count">' + world.noteSlugs.length + '</span></button>')
+      .join("");
+  }
+
+  function toggleWorldMenu() {
+    const open = elements.worldMenu.classList.contains("hidden");
+    elements.worldMenu.classList.toggle("hidden", !open);
+    elements.worldButton.setAttribute("aria-expanded", String(open));
+  }
+
+  function closeWorldMenu() {
+    elements.worldMenu.classList.add("hidden");
+    elements.worldButton.setAttribute("aria-expanded", "false");
   }
 
   function navigateGraph() {
@@ -1372,19 +1758,24 @@ function buildAppJs() {
 
   function renderSidebar() {
     const query = elements.search.value.trim().toLowerCase();
-    const filtered = notes.filter((note) => {
+    const filtered = worldNotes().filter((note) => {
       const matchesQuery = !query || note.title.toLowerCase().includes(query) || note.excerpt.toLowerCase().includes(query);
       const matchesTag = !currentTag || note.tags.includes(currentTag);
       return matchesQuery && matchesTag;
     });
 
-    elements.fileList.innerHTML = filtered
-      .map((note) => '<a class="file-item" data-slug="' + note.slug + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
-      .join("");
+    elements.fileList.innerHTML = filtered.length
+      ? filtered
+          .map((note) => '<a class="file-item" data-slug="' + escapeHtml(note.slug) + '" href="#/note/' + encodeURIComponent(note.slug) + '"><span class="file-title">' + escapeHtml(note.title) + '</span></a>')
+          .join("")
+      : '<div class="context-empty">No notes</div>';
 
-    elements.tagList.innerHTML = data.tags
-      .map((tag) => '<a class="tag-pill" data-tag="' + escapeHtml(tag.name) + '" href="#/tag/' + encodeURIComponent(tag.name) + '">#' + escapeHtml(tag.name) + ' <span>' + tag.count + '</span></a>')
-      .join("");
+    const tags = currentWorld?.tags || [];
+    elements.tagList.innerHTML = tags.length
+      ? tags
+          .map((tag) => '<a class="tag-pill" data-tag="' + escapeHtml(tag.name) + '" href="#/tag/' + encodeURIComponent(tag.name) + '">#' + escapeHtml(tag.name) + ' <span>' + tag.count + '</span></a>')
+          .join("")
+      : '<div class="context-empty">No tags</div>';
 
     updateActiveStates();
   }

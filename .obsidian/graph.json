@@ -6,22 +6,7 @@
   "hideUnresolved": false,
   "showOrphans": true,
   "collapse-color-groups": false,
-  "colorGroups": [
-    {
-      "query": "tag:#compex_numbers  ",
-      "color": {
-        "a": 1,
-        "rgb": 11752160
-      }
-    },
-    {
-      "query": "tag:manifold",
-      "color": {
-        "a": 1,
-        "rgb": 4815839
-      }
-    }
-  ],
+  "colorGroups": [],
   "collapse-display": false,
   "showArrow": false,
   "textFadeMultiplier": 0,

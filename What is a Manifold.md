@@ -586,8 +586,17 @@ This rigorously proves that no single flat parameter domain can smoothly cover a
 Complex manifolds require multiple local coordinate charts patched together.
 
 
-#manifold #differential_geometry #what
+
+
+
+
 
 [^1]: The mapping is from $\mathbb{R}^k$ to $\mathbb{R}^{n-k}$ is because we will focus on the concatenated $n$ dimensional space out of the domain and co-domain where the real manifold lives later. Don't worry if you feel confused here, threat $n-k$ as the dimension of the co-domain of the mapping normally is fine.
 
 [^2]: A $C^1$ mapping is a function whose first partial derivatives exist and are continuous (i.e., it is continuously differentiable).
+
+
+#differential_geometry #manifold
+
+
+

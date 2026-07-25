@@ -203,7 +203,7 @@ $$
 This is true for every eigenvalue of $M$, so all eigenvalues are positive. Therefore $M$ is positive definite.
 
 
-# Method 5. Using the Spectral Theorem
+# Method 5. Linearly Independent Columns
 > [!quote] Theorem 5
 > *A symmetric matrix $M$ is positive definite if and only if $M$ can be written as*
 > 
@@ -271,3 +271,5 @@ $$
 	\mathbf{x}^\text{T}M\mathbf{x}>0
 $$
 Using **Theorem 4**, $M$ is positive definite.
+
+#linear_algebra #matrix 

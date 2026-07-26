@@ -1,6 +1,6 @@
 # Handout 01 · The Completeness of the Real Numbers
 
-> **Goal of this handout:** Lay the ground floor of the entire building. We introduce the **Least Upper Bound Property** — the one axiom that distinguishes ℝ from ℚ — and derive its three equivalent manifestations: the **Monotone Convergence Theorem**, the **Nested Intervals Theorem**, and the **Archimedean Property**. Every existence proof in the series will trace back to one of these faces.
+> **Goal of this handout:** Lay the ground floor of the entire building. We introduce the **Least Upper Bound Property** — the one axiom that distinguishes ℝ from ℚ — and derive three key consequences: the **Monotone Convergence Theorem**, the **Nested Intervals Theorem**, and the **Archimedean Property**. Every existence proof in the series will trace back to one of these results.
 
 **Main theorems:** ⭐ **Supremum Principle (LUB Property)**; ⭐ **Monotone Convergence Theorem (MCT)**; ⭐ **Nested Intervals Theorem**; ⭐ **Archimedean Property**.
 
@@ -64,9 +64,14 @@ One can also *construct* $\mathbb{R}$ from $\mathbb{Q}$ (using Dedekind cuts or 
 
 ---
 
-## 1.4 Three Equivalent Faces of Completeness
+## 1.4 Three Consequences of Completeness
 
-The LUB axiom has three equivalent reformulations, each of which is more directly useful in a specific context. We prove them from the axiom; any one of them could serve as an alternative axiom.
+From the LUB axiom we derive three important consequences. The logical relationships are:
+
+$$\text{Completeness} \Longrightarrow \text{MCT} \Longrightarrow \text{Nested Intervals}$$
+$$\text{Completeness} \Longrightarrow \text{Archimedean Property}$$
+
+The Archimedean property is a strictly weaker statement (the rationals are Archimedean but not complete). MCT and Nested Intervals are each proved in sequence from completeness; both are used extensively in later handouts.
 
 ### ⭐ Theorem 1.5 (Monotone Convergence Theorem, MCT)
 
@@ -112,9 +117,9 @@ You will see this template in action in handouts 05 (IVT) and 07 (integrability 
 
 - ℚ has a gap at $\sqrt{2}$: the set $\{x \in \mathbb{Q} : x^2 < 2\}$ is bounded above but has no supremum in $\mathbb{Q}$.
 - ⭐ The **LUB axiom** asserts that every non-empty bounded-above subset of ℝ has a supremum in ℝ. This is the defining property of the real numbers.
-- ⭐ **MCT**: monotone increasing + bounded above $\Rightarrow$ convergent.
-- ⭐ **Nested Intervals**: nested closed intervals have non-empty intersection; if lengths $\to 0$, a unique point.
-- ⭐ **Archimedean Property**: $\frac{1}{n} \to 0$; no infinitesimals in $\mathbb{R}$.
+- ⭐ **MCT** (consequence of completeness): monotone increasing + bounded above $\Rightarrow$ convergent.
+- ⭐ **Nested Intervals** (consequence of MCT): nested closed intervals have non-empty intersection; if lengths $\to 0$, a unique point.
+- ⭐ **Archimedean Property** (separate consequence of completeness): $\frac{1}{n} \to 0$; no infinitesimals in $\mathbb{R}$. This is strictly weaker than completeness — $\mathbb{Q}$ is Archimedean but not complete.
 - The **Approximation Property** of $\sup$ ($c = \sup S$ iff $c$ is an upper bound and you can get within $\varepsilon$ of $c$ from inside $S$) is the practical tool for proofs.
 
 → [Handout 02: Limits and the Epsilon Language](02-Limits and the Epsilon Language.md)

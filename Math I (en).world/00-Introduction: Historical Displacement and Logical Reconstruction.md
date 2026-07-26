@@ -23,7 +23,7 @@ Here is the structure we will build over the course of this series:
   └─────────────────────────────────────────┘
 ```
 
-History built this upside down. Newton and Leibniz moved straight into the fourth floor — derivatives, integrals, and the relationship between them — without having laid the ground floor at all. The building stood, dazzlingly, for two centuries. Then in 1734, a bishop noticed the foundations were missing.
+History built this upside down. Newton and Leibniz moved straight into the fourth floor — derivatives, integrals, and the relationship between them — without having laid the ground floor at all. The building stood for two centuries. Then in 1734, a bishop noticed the foundations were missing.
 
 ---
 

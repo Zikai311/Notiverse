@@ -60,7 +60,7 @@ By the **Nested Intervals Theorem** (Theorem 1.6), there is a unique point $\xi 
 
 In either case, a convergent subsequence exists. $\blacksquare$
 
-> Proof B is slicker: it shows that every bounded sequence either has a decreasing convergent subsequence or an increasing one — you cannot avoid both. The peak-point argument is a beautiful example of a combinatorial trick doing heavy lifting.
+> Proof B is more concise: it shows that every bounded sequence either has a decreasing convergent subsequence or an increasing one — you cannot avoid both. The peak-point argument is a good example of a combinatorial observation doing the necessary work.
 
 ---
 

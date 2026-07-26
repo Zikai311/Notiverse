@@ -1,6 +1,6 @@
 # Handout 06 · The Mean Value Theorem
 
-> **Goal of this handout:** Use the two pillars from the previous two handouts (EVT and Fermat) together to prove **Rolle's Theorem**, then generalise to the **Mean Value Theorem (MVT)**. The payoff is a corollary that looks almost trivial but is the single key unlocking the Fundamental Theorem of Calculus: *if a function's derivative is identically zero, the function is constant.*
+> **Goal of this handout:** Use EVT and Fermat together to prove **Rolle's Theorem**, then generalise to the **Mean Value Theorem (MVT)**. The payoff is a corollary that looks almost trivial but is needed for the Fundamental Theorem of Calculus: *if a function's derivative is identically zero, the function is constant.*
 
 **Main theorems:** ⭐ **Rolle's Theorem**; ⭐ **Lagrange's Mean Value Theorem (MVT)**; ⭐ **Corollary: $f' \equiv 0 \Rightarrow f$ constant**.
 
@@ -83,13 +83,13 @@ $$g'(x) = f'(x) - \frac{f(b) - f(a)}{b - a},$$
 
 setting $x = c$ and $g'(c) = 0$ gives $f'(c) = \dfrac{f(b) - f(a)}{b - a}$. $\blacksquare$
 
-> **Savour the "tilting flat" trick.** We did not re-invent the wheel — we transformed the new problem into one already solved. The auxiliary function $g = f - \ell$ removes the tilt; the equal endpoints in $g$ unlock Rolle. Whenever you see a "general case" proved by reduction to a "special case", look for this kind of auxiliary function. (The Cauchy Mean Value Theorem, which we do not cover here, is yet another instance of the same move.)
+> **Note the "tilting flat" trick.** We did not re-invent the wheel — we transformed the new problem into one already solved. The auxiliary function $g = f - \ell$ removes the tilt; the equal endpoints in $g$ allow Rolle to apply. Whenever you see a "general case" proved by reduction to a "special case", look for this kind of auxiliary function. (The Cauchy Mean Value Theorem, which we do not cover here, is yet another instance of the same move.)
 
 ---
 
 ## 6.4 The Bridge Corollary ⭐
 
-Now we harvest the crucial consequence of MVT — the theorem that will unlock the Fundamental Theorem of Calculus.
+We now extract the key consequence of the MVT — the corollary needed for the Fundamental Theorem of Calculus.
 
 ### ⭐ Corollary 6.3
 
@@ -109,7 +109,7 @@ Hence $f(x_1) = f(x_2)$. Since $x_1, x_2$ were arbitrary, $f$ is constant. $\bla
 
 *Proof:* Apply Corollary 6.3 to $h = f - g$, noting $h' \equiv 0$. $\blacksquare$
 
-> **Why emphasise this form?** Because in the proof of FTC2 (handout 08), the key step is: "the variable upper limit integral $\Phi$ and the given antiderivative $F$ both satisfy $\Phi' = f = F'$, hence $\Phi = F + C$." That single application of this corollary is what converts FTC1 into the Newton–Leibniz formula. **This corollary is the passport that lets the differentiation world hand information to the integration world.**
+> **Why emphasise this form?** Because in the proof of FTC2 (handout 08), the key step is: "the variable upper limit integral $\Phi$ and the given antiderivative $F$ both satisfy $\Phi' = f = F'$, hence $\Phi = F + C$." That single application of this corollary converts FTC1 into the Newton–Leibniz formula.
 
 ---
 
@@ -136,7 +136,7 @@ One sentence capturing the flow of ideas:
 
 - ⭐ **Rolle's Theorem**: EVT + Fermat, applied to the equal-endpoint case. Continuous on $[a,b]$, differentiable on $(a,b)$, $f(a) = f(b)$ ⟹ some interior $c$ with $f'(c) = 0$.
 - ⭐ **MVT (Lagrange)**: "tilting flat" via the auxiliary function $g = f - \ell$ reduces the general case to Rolle.
-- ⭐ **Bridge Corollary**: $f' \equiv 0 \Rightarrow f$ constant; equivalently $f' = g' \Rightarrow f = g + C$. This is the sole key to FTC2.
+- ⭐ **Bridge Corollary**: $f' \equiv 0 \Rightarrow f$ constant; equivalently $f' = g' \Rightarrow f = g + C$. This is what FTC2 requires.
 
 The differentiation toolkit is now complete. Next we turn to integration — giving "area" a rigorous definition (the Riemann sum) — before the two sides meet in the Fundamental Theorem.
 

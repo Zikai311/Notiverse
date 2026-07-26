@@ -139,7 +139,7 @@ Two properties of the definite integral are needed in the proof of FTC. Their pr
   $$m(b-a) \le \int_a^b f \le M(b-a).$$
   (The integral of a function bounded between two horizontal lines is bounded between two rectangles.)
 
-The integral bounds property is the star of FTC1.
+The integral bounds property is used directly in FTC1.
 
 ---
 
@@ -151,7 +151,7 @@ The integral bounds property is the star of FTC1.
 - ⭐ **Continuous $\Rightarrow$ integrable**: oscillation on each subinterval can be controlled uniformly by making the partition fine enough, thanks to **uniform continuity** (Heine–Cantor). Uniform continuity follows from compactness, which follows from completeness.
 - Tools for the next handout: **additivity** and **integral bounds**.
 
-The integration side is ready. The next handout is the climax of the series — proving that differentiation and integration are inverse operations.
+The integration side is ready. The next handout proves that differentiation and integration are inverse operations — bringing together most of what has been built so far.
 
 → [Handout 08: The Fundamental Theorem of Calculus](08-The Fundamental Theorem of Calculus.md)
 

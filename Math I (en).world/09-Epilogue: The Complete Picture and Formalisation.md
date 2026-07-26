@@ -39,7 +39,7 @@ Now you can appreciate what the repair work actually involved:
 
 This course did not follow the historical path. We built from the ground up — from a number system with no gaps, upward to limits, then compactness, then calculus. The result is a building in which every brick can be inspected: there are no floors where the beams are secretly made of good intentions.
 
-> **The broader lesson:** The most spectacular results (FTC) and the most unassuming foundations (completeness) are often separated by the entire height of the building. But the foundations are what decide whether the building stands. Whenever something "obviously" works, look downward once — the interesting question is usually there.
+> **The broader lesson:** The most substantial results (FTC) and the most unassuming foundations (completeness) are often separated by the entire height of the building. But the foundations are what decide whether the building stands. Whenever something "obviously" works, look downward once — the interesting question is usually there.
 
 ---
 
@@ -73,7 +73,7 @@ Throughout this series, we have insisted on not letting any "obvious" step slide
 
 **Lean** is one such system — a *proof assistant* and *interactive theorem prover*. In Lean, you do not write a proof for a human reader; you write it for a machine that will reject every unjustified step. If the proof compiles, it is correct.
 
-> **This is the same spirit that has driven the whole course** — "do not let any 'obvious' pass without examination" — handed to a machine that enforces it absolutely.
+> **This is the same spirit that has driven the whole course** — "do not let any 'obvious' pass without examination" — carried to its logical conclusion.
 
 Why is the material of this course well-suited to formalisation? Because the $\varepsilon$–$N$ and $\varepsilon$–$\delta$ definitions already have the structure of formal logic: $\forall \varepsilon > 0,\ \exists N,\ \forall n \ge N: \ldots$. In Lean, this becomes literally `∀ ε > 0, ∃ N, ∀ n ≥ N, ...`. You have been writing formal logic on paper all along; the winter task asks you to run it on a machine.
 
@@ -103,7 +103,7 @@ Every proof technique you practised on paper becomes a concrete object the machi
 
 These sentences, accumulated over 15 levels, are a record of exactly where your understanding has been sharpened.
 
-> **The connection to the whole course.** Berkeley challenged Newton's "obvious" reasoning two centuries ago. Today, you challenge your own. The Lean verifier is Berkeley's ghost, made computational — equally unimpressed by appeals to intuition, equally demanding of full justification. This is the same intellectual spirit, three hundred years on.
+> **The connection to the whole course.** Berkeley challenged Newton's "obvious" reasoning two centuries ago. Today, you challenge your own. A proof assistant — Lean in this case — enforces the same standard computationally: every step must be fully justified; appeals to intuition are rejected. The intellectual demand is the same; the medium has changed.
 
 ---
 
@@ -111,7 +111,7 @@ These sentences, accumulated over 15 levels, are a record of exactly where your 
 
 This course has done one thing, done thoroughly:
 
-**It took a magnificent building constructed on uncertain ground — seventeenth-century calculus — dismantled it brick by brick, and rebuilt it from a foundation that can be examined: the completeness of the real numbers.**
+**It took seventeenth-century calculus — a building constructed on uncertain ground — dismantled it brick by brick, and rebuilt it from a foundation that can be examined: the completeness of the real numbers.**
 
 What you should carry away is not a list of theorems, but a **way of looking**:
 

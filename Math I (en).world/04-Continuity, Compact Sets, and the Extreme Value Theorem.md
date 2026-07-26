@@ -56,7 +56,7 @@ This combines two requirements: the subsequence converges (some limit exists), a
 
 **Proof.** Let $(y_n)$ be any sequence in $f(K)$; write $y_n = f(x_n)$ with $x_n \in K$. Since $K$ is compact, extract a subsequence $x_{n_k} \to \xi \in K$. By continuity, $f(x_{n_k}) \to f(\xi) \in f(K)$. So every sequence in $f(K)$ has a subsequence converging to a point of $f(K)$. $\blacksquare$
 
-> This proposition is the bridge. The hypotheses are on the domain ($f$ continuous, $K$ compact); the conclusion lands on the range ($f(K)$ compact). Compactness is the currency that transfers from domain to image.
+> This proposition is the bridge: the hypotheses are on the domain ($f$ continuous, $K$ compact); the conclusion lands on the range ($f(K)$ compact).
 
 ---
 
@@ -90,7 +90,7 @@ Let $M = \sup_{x \in [a,b]} f(x)$. Choose $x_n \in [a,b]$ with $f(x_n) > M - \fr
 - ⭐ **Compact** = every sequence has a subsequence converging to a point of the set. In ℝ: compact ↔ closed and bounded (**Heine–Borel**).
 - ⭐ **Continuous image of compact = compact**: compactness transfers from domain to range under continuous maps.
 - ⭐ **EVT**: continuous function on $[a,b]$ attains its max and min. Proof chain: closed interval → compact domain → compact image → sup is attained. Each arrow requires a specific hypothesis.
-- The EVT is one of the two main **existence pillars** of the series (the other is the IVT, handout 05). It guarantees that extrema exist; the next handout provides tools to locate them.
+- The EVT and the IVT (handout 05) are the two main existence theorems of the series: EVT guarantees extrema exist; the next handout provides tools to locate them.
 
 → [Handout 05: The Intermediate Value Theorem and Fermat's Theorem](05-The Intermediate Value Theorem and Fermat's Theorem.md)
 

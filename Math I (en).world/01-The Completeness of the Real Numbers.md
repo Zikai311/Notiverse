@@ -81,7 +81,7 @@ The Archimedean property is a strictly weaker statement (the rationals are Archi
 
 Given $\varepsilon > 0$, by the approximation property (Proposition 1.3(ii)), there exists some $a_N > L - \varepsilon$. Since the sequence is increasing, $a_n \ge a_N > L - \varepsilon$ for all $n \ge N$. Also $a_n \le L$ for all $n$. Hence $|a_n - L| < \varepsilon$ for all $n \ge N$. $\blacksquare$
 
-> **How MCT is used upstream:** Whenever we need to extract a convergent subsequence (handout 03) or verify that a sequence of approximations converges, MCT provides the engine.
+> **How MCT is used upstream:** Whenever we need to extract a convergent subsequence (handout 03) or verify that a sequence of approximations converges, MCT provides the convergence guarantee.
 
 ### ⭐ Theorem 1.6 (Nested Intervals Theorem)
 

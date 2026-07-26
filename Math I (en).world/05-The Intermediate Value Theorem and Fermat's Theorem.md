@@ -48,7 +48,7 @@ We show $f(c) = 0$ by ruling out both alternatives.
 
 Neither alternative is possible, so $f(c) = 0$. $\blacksquare$
 
-> **Reflecting on Strategy A:** The point $c = \sup S$ might not be a rational number — it might be exactly the kind of irrational $\sqrt{2}$ that $\mathbb{Q}$ lacks. The LUB axiom *manufactures* this point out of the completeness of $\mathbb{R}$. The entire magic of the IVT is concentrated in that single $\sup$.
+> **Reflecting on Strategy A:** The point $c = \sup S$ might not be a rational number — it might be exactly the kind of irrational $\sqrt{2}$ that $\mathbb{Q}$ lacks. The LUB axiom manufactures this point out of the completeness of $\mathbb{R}$. The entire proof turns on that single $\sup$.
 
 > **The sign-preservation lemma:** The key micro-tool used twice above: *if $f(c) \ne 0$, then $f$ keeps the same sign as $f(c)$ in a small neighbourhood of $c$*. This follows directly from $\varepsilon$–$\delta$ continuity (take $\varepsilon = |f(c)|$). You will see this tool used again in handout 08.
 
@@ -102,18 +102,18 @@ Since $f$ is differentiable, both one-sided limits equal $f'(x_0)$. Hence $f'(x_
 
 ---
 
-## 5.5 The Two Existence Pillars
+## 5.5 The Two Main Existence Theorems
 
 We now have both foundational existence tools in place:
 
-| Pillar | Statement | Root | Serves |
+| Theorem | Statement | Root | Serves |
 |--------|-----------|------|--------|
 | **EVT** (handout 04) | Continuous $f$ on $[a,b]$ attains max and min | Compactness ← Completeness | Optimisation: extrema *exist* |
 | **IVT** (this handout) | Continuous $f$ takes every intermediate value; sign change ⟹ zero | LUB axiom ← Completeness | Equations: zeros *exist* |
 
 Plus the necessary condition **Fermat's Theorem** (interior extremum + differentiable ⟹ $f' = 0$), which locates where extrema can hide.
 
-Both pillars share the same root: the completeness of $\mathbb{R}$.
+Both trace back to the completeness of $\mathbb{R}$.
 
 In the next handout, we bring EVT and Fermat together to prove Rolle's Theorem, from which the full Mean Value Theorem follows.
 

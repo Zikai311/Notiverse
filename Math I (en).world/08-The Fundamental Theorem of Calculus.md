@@ -1,6 +1,6 @@
 # Handout 08 · The Fundamental Theorem of Calculus
 
-> **Goal of this handout:** The climax of the series. We prove that **differentiation and integration are inverse operations** — a result so fundamental it has given its name to an entire branch of mathematics. The proof assembles every major tool developed over the preceding seven handouts. You will watch them all arrive at the same place.
+> **Goal of this handout:** We prove that **differentiation and integration are inverse operations**. The proof assembles the major tools from the preceding seven handouts: EVT, IVT, the Bridge Corollary, and the integrability of continuous functions.
 
 **Main theorems:** ⭐ **FTC1 (the variable upper limit integral is an antiderivative)**; ⭐ **FTC2 (Newton–Leibniz formula)**.
 
@@ -75,7 +75,7 @@ $$f(c_h) = \frac{\Phi(x+h) - \Phi(x)}{h}.$$
 
 $$\Phi'(x) = \lim_{h \to 0} \frac{\Phi(x+h) - \Phi(x)}{h} = \lim_{h \to 0} f(c_h) = f(x). \qquad \blacksquare$$
 
-> **Take a moment to notice who showed up:** additivity (to write the strip integral), **EVT** (to bound the difference quotient), **IVT** (to realise it as a function value), and **continuity** (to pass to the limit). Two of the three handouts above this one contributed their main theorem directly.
+> **The proof draws on:** additivity (to write the strip integral), **EVT** (to bound the difference quotient), **IVT** (to realise it as a function value), and **continuity** (to pass to the limit). Two of the three handouts above this one contributed their main theorem directly.
 
 ---
 
@@ -155,9 +155,9 @@ Observe the two inputs to FTC:
 
 And EVT, IVT, and the Bridge Corollary all trace their roots to **completeness**. Therefore:
 
-> **The Fundamental Theorem of Calculus — the pinnacle of this building — rests on a single foundation: the real numbers have no gaps.**
+> **The Fundamental Theorem of Calculus — the culmination of this series — rests on a single foundation: the real numbers have no gaps.**
 
-This is the ultimate form of the spirit that has animated every handout in this series.
+Every step in the proof chain traces back to completeness.
 
 ---
 

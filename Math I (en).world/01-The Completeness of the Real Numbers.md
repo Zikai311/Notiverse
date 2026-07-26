@@ -122,6 +122,10 @@ You will see this template in action in handouts 05 (IVT) and 07 (integrability 
 - ⭐ **Archimedean Property** (separate consequence of completeness): $\frac{1}{n} \to 0$; no infinitesimals in $\mathbb{R}$. This is strictly weaker than completeness — $\mathbb{Q}$ is Archimedean but not complete.
 - The **Approximation Property** of $\sup$ ($c = \sup S$ iff $c$ is an upper bound and you can get within $\varepsilon$ of $c$ from inside $S$) is the practical tool for proofs.
 
+**The significance of this handout in the calculus building:**
+
+> From this point on, whenever a theorem asserts that "something **exists**" — a limit, an extremum, a zero, an antiderivative — you can trace the proof downward and will always arrive at the **LUB axiom** as the foundation. If you cannot trace it there, the proof has a gap.
+
 → [Handout 02: Limits and the Epsilon Language](02-Limits and the Epsilon Language.md)
 
 ---

@@ -72,10 +72,10 @@ The subject was built from the top down. The most substantial results came first
                   Completeness of ℝ (LUB Axiom)                  [Handout 01]
                               │
                 ┌─────────────┴──────────────┐
-                ▼                             ▼
+                ▼                            ▼
          Limits (ε language)  [Handout 02]   Monotone Convergence
-                │                             │
-                ▼                             ▼
+                │                            │
+                ▼                            ▼
    Bolzano–Weierstrass Theorem  ◄──────  Nested Intervals  [Handout 03]
    (bounded sequence ⟹ convergent subsequence)
                 │
@@ -86,7 +86,7 @@ The subject was built from the top down. The most substantial results came first
         ▼                ▼
    Extreme Value     Intermediate Value Theorem  [Handout 05]
    Theorem (EVT)     (IVT — zeros exist)
-   (max/min exist)        │
+   (max/min exist)       │
         │                ▼
         │          Fermat's Theorem (critical point condition)
         │                │

@@ -11,10 +11,14 @@
             "id": "73c5ec0079eb2651",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Math I.world/08-微积分基本定理.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "08-微积分基本定理"
             }
           },
           {
@@ -213,8 +217,25 @@
   },
   "active": "73c5ec0079eb2651",
   "lastOpenFiles": [
-    "Math I.world/09-尾声.md",
     "Math I.world/00-导论.md",
+    "Math I.world/02-极限与ε语言.md",
+    "Math I.world/01-实数的完备性.md",
+    "Math I.world/08-微积分基本定理.md",
+    "Math I (en).world/00-Introduction: Historical Displacement and Logical Reconstruction.md",
+    "Math I.world/09-尾声.md",
+    "Math I.world/07-黎曼积分.md",
+    "Math I.world/06-微分中值定理.md",
+    "Math I.world/04-连续性紧集与极值定理.md",
+    "Math I.world/05-介值定理与费马定理.md",
+    "Math I.world/03-序列紧性与BW定理.md",
+    "Math I (en).world/04-Continuity, Compact Sets, and the Extreme Value Theorem.md",
+    "Math I (en).world/05-The Intermediate Value Theorem and Fermat's Theorem.md",
+    "Math I (en).world/06-The Mean Value Theorem.md",
+    "Math I (en).world/08-The Fundamental Theorem of Calculus.md",
+    "Math I (en).world/07-The Riemann Integral.md",
+    "Math II.world/What is a Manifold.md",
+    "Math II.world/Why Complex Eigenvector Represents Rotation?.md",
+    "Math I (en).world/09-Epilogue: The Complete Picture and Formalisation.md",
     "Curvature of the graph of y=f(x).md",
     "6.8 Fubini 定理.md",
     "What is a Manifold.md",
@@ -222,16 +243,8 @@
     "Complex Numbers are Special Kinds of 2×2 Matrices.md",
     "5 Ways to Show a Symmetric Matrix is Positive Definite.md",
     "The Matrix Operator View of Euler’s Identity.md",
-    "README.md",
-    "Why Complex Eigenvector Represents Rotation?.md",
     "Pasted image 20260514161330.png",
-    "What is a Manifold? An Extrinsic Viewpoint.md",
-    "node_modules/katex/contrib/mhchem/README.md",
-    "node_modules/commander/Readme.md",
     "Untitled.base",
-    "docs/assets/favicon.svg",
-    "node_modules/punycode.js/README.md",
-    "Welcome.md",
-    "create a link.md"
+    "docs/assets/favicon.svg"
   ]
 }

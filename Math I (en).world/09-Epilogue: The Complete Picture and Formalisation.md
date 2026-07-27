@@ -43,8 +43,7 @@ This course did not follow the historical path. We built from the ground up — 
 
 ---
 
-## 9.3 What We Skipped: Honest Boundaries
-
+## 9.3 What We Skipped
 A good course is honest about its own edges. We deliberately simplified or omitted the following; none of them undermine the main arguments, but you will fill them in when you study real analysis properly:
 
 1. **The construction of ℝ (handout 01).** We took completeness as an axiom. There are two standard constructions of ℝ from ℚ — **Dedekind cuts** and **equivalence classes of Cauchy sequences** — each of which turns the LUB property from an axiom into a theorem. The axiomatic approach is pedagogically cleaner for a first course.
@@ -61,7 +60,7 @@ A good course is honest about its own edges. We deliberately simplified or omitt
 
 ---
 
-## 9.4 The Third Word in the Course Title: Formalisation
+## 9.4 Formalisation
 
 The full title of this course is *Calculus — Theory, Applications, and **Formal Methods***. The first eight handouts covered the theory. Now for the third term.
 

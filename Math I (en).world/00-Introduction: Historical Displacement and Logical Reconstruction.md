@@ -10,7 +10,7 @@ Here is the structure we will build over the course of this series:
 
 ```
   ┌─────────────────────────────────────────┐
-  │  4th floor: The Fundamental Theorem     │  ← where everyone wants to live
+  │  4th floor: The Fundamental Theorem     │
   │  (differentiation ⇄ integration)        │
   ├─────────────────────────────────────────┤
   │  3rd floor: Mean Value Theorem,         │
@@ -53,8 +53,6 @@ This was the **Second Mathematical Crisis** — not because calculus produced wr
 
 ## 0.3 Historical Order vs Logical Order
 
-Here is the uncomfortable fact about how calculus actually developed:
-
 | Approximate date | What was discovered |
 |-----------------|---------------------|
 | 1660s–1680s | Integration (areas, volumes) |
@@ -64,9 +62,48 @@ Here is the uncomfortable fact about how calculus actually developed:
 | 1820s | Rigorous definition of limits (Cauchy) |
 | 1860s | Rigorous definition of real numbers (Weierstrass, Dedekind) |
 
-The subject was built from the top down. The most spectacular results came first; the justification came two hundred years later. Cauchy introduced the $\varepsilon$–$\delta$ language in the 1820s; Dedekind and Weierstrass gave a rigorous construction of the real numbers in the 1860s–1870s.
+The subject was built from the top down. The most substantial results came first; the justification came two hundred years later. Cauchy introduced the $\varepsilon$–$\delta$ language in the 1820s; Dedekind and Weierstrass gave a rigorous construction of the real numbers in the 1860s–1870s.
 
 **This course reverses the historical order.** We begin at the ground floor — the completeness of $\mathbb{R}$ — and build upwards. This is not the order in which the ideas were discovered, but it is the order in which they can be understood without contradiction.
+
+### Logical Dependency Map
+
+```
+                  Completeness of ℝ (LUB Axiom)                  [Handout 01]
+                              │
+                ┌─────────────┴──────────────┐
+                ▼                             ▼
+         Limits (ε language)  [Handout 02]   Monotone Convergence
+                │                             │
+                ▼                             ▼
+   Bolzano–Weierstrass Theorem  ◄──────  Nested Intervals  [Handout 03]
+   (bounded sequence ⟹ convergent subsequence)
+                │
+                ▼
+       Continuity + Compact sets       [Handout 04]
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+   Extreme Value     Intermediate Value Theorem  [Handout 05]
+   Theorem (EVT)     (IVT — zeros exist)
+   (max/min exist)        │
+        │                ▼
+        │          Fermat's Theorem (critical point condition)
+        │                │
+        └───────┬────────┘
+                ▼
+      Rolle's Theorem ⟹ Mean Value Theorem       [Handout 06]
+                │
+                ▼
+      Corollary: f' ≡ 0 ⟹ f constant    ← bridge to integration
+                │
+      Riemann integral (partition·approximate·sum·limit)  [Handout 07]
+                │
+                ▼
+      Fundamental Theorem of Calculus (FTC)        [Handout 08]
+      · FTC1 (accumulation function is an antiderivative)  ← uses EVT + IVT
+      · FTC2 (Newton–Leibniz formula)               ← uses f' ≡ 0 ⟹ const
+```
 
 ---
 
@@ -80,27 +117,61 @@ Formally: every non-empty set of real numbers that is bounded above has a least 
 
 This single property — variously called the **Least Upper Bound Property**, the **Completeness Axiom**, or the **Supremum Principle** — is what makes everything else work. Follow any theorem in this series back to its roots, and you will arrive here.
 
-> **The ghost of $\Delta x$ was exorcised when Cauchy replaced "infinitely small" with "for all $\varepsilon > 0$".
-> But the $\varepsilon$ language only *works* because ℝ is complete — otherwise the limits that language describes might not exist.**
+> **Every object that calculus needs — a maximum value, a zero, a mean-value point, an antiderivative — must first be proved to exist. And every such proof of existence traces back, in the end, to a single source: the completeness of ℝ.**
+
+> The ghost of $\Delta x$ was exorcised when Cauchy replaced "infinitely small" with "for all $\varepsilon > 0$". But the $\varepsilon$ language only *works* because ℝ is complete — otherwise the limits that language describes might not exist.
 
 ---
 
-## 0.5 A Map of the Journey
+## 0.5 Handouts in This Series
 
-The course is structured as a single logical chain. Each handout has exactly one job: to deliver one key theorem to the handout above it.
+| Handout | Title | Summary |
+|---------|-------|---------|
+| [00](00-Introduction: Historical Displacement and Logical Reconstruction.md) | Introduction | Why reconstruct in reverse |
+| [01](01-The Completeness of the Real Numbers.md) | The Completeness of the Real Numbers | Ground floor: ℝ has no gaps |
+| [02](02-Limits and the Epsilon Language.md) | Limits and the Epsilon Language | Banishing the ghost of infinitesimals |
+| [03](03-Sequential Compactness and the Bolzano-Weierstrass Theorem.md) | Sequential Compactness and Bolzano–Weierstrass | Bounded sequences cannot escape |
+| [04](04-Continuity, Compact Sets, and the Extreme Value Theorem.md) | Continuity, Compact Sets, and EVT | Existence guarantee for optimisation |
+| [05](05-The Intermediate Value Theorem and Fermat's Theorem.md) | The Intermediate Value Theorem and Fermat's Theorem | Zeros exist; critical point condition |
+| [06](06-The Mean Value Theorem.md) | The Mean Value Theorem | Rolle to Lagrange; the bridge to integration |
+| [07](07-The Riemann Integral.md) | The Riemann Integral | A rigorous definition of area |
+| [08](08-The Fundamental Theorem of Calculus.md) | The Fundamental Theorem of Calculus | Differentiation and integration are inverse operations |
+| [09](09-Epilogue: The Complete Picture and Formalisation.md) | Epilogue: The Complete Picture and Formalisation | The full dependency chain; Lean formalisation |
 
-| Handout | Key theorem delivered | Depends on |
-|---------|----------------------|------------|
-| 01 | Completeness of ℝ (LUB axiom) | Axiom |
-| 02 | Limits: the $\varepsilon$–$N$ language | Completeness |
-| 03 | Bolzano–Weierstrass theorem | Completeness |
-| 04 | Extreme Value Theorem (EVT) | BW, limits |
-| 05 | Intermediate Value Theorem (IVT), Fermat's theorem | Completeness, limits |
-| 06 | Mean Value Theorem (MVT) | EVT, Fermat |
-| 07 | Riemann integral; continuity ⟹ integrability | Compactness |
-| 08 | Fundamental Theorem of Calculus | EVT, IVT, MVT corollary |
+---
 
-By the end of handout 08, the Second Mathematical Crisis will be fully resolved: the "ghost of departed quantities" will have been replaced by a complete, rigorous argument that Berkeley himself could not fault.
+## 0.6 How to Read This Series
+
+Each handout opens with a **motivation section** — the "why" before the "what". The theorems follow the pattern:
+
+- **Motivation** — what problem forces this definition or theorem into existence
+- **Proof strategy** — the key idea in plain language, before any symbols appear
+- **Proof details** — the rigorous argument
+
+**⭐** marks the load-bearing theorems of the series — the ones every later handout depends on directly.  
+**📎** marks technical lemmas: necessary scaffolding, but not the main story. On a first reading, accept them and move on.
+
+The series is a **single dependency chain**. A theorem in handout $n$ is only invoked after it has been proved in an earlier handout. Follow the arrows in the map above and the logic is self-contained.
+
+---
+
+## 0.7 Notation
+
+| Symbol | Meaning |
+|--------|---------|
+| $\mathbb{N}$ | Natural numbers $\{1, 2, 3, \ldots\}$ |
+| $\mathbb{Q}$ | Rational numbers |
+| $\mathbb{R}$ | Real numbers |
+| $\forall$ | "for all" |
+| $\exists$ | "there exists" |
+| $\sup S$ | Least upper bound (supremum) of set $S$ |
+| $\inf S$ | Greatest lower bound (infimum) of set $S$ |
+| $(a_n)$ | A sequence with general term $a_n$ |
+| $a_n \to L$ | The sequence $(a_n)$ converges to $L$ |
+| $[a,b]$ | Closed interval: $\{x \in \mathbb{R} : a \le x \le b\}$ |
+| $(a,b)$ | Open interval: $\{x \in \mathbb{R} : a < x < b\}$ |
+
+---
 
 → [Handout 01: The Completeness of the Real Numbers](01-The Completeness of the Real Numbers.md)
 
@@ -114,4 +185,4 @@ By the end of handout 08, the Second Mathematical Crisis will be fully resolved:
 
 3. Suppose someone says: "The $\varepsilon$–$\delta$ definition of a limit works fine for functions on $\mathbb{Q}$, so we don't need ℝ to be complete." Construct a specific counterexample — a sequence of rationals that *should* converge but does not converge *in* $\mathbb{Q}$.
 
-4. Preview question: we will define $\sup S$ (the supremum of a set $S$) carefully in handout 01. Before reading it, try to write down what properties a "least upper bound" should have. How many properties are needed to pin down the definition uniquely?
+4. Preview question: we will define $\sup S$ carefully in handout 01. Before reading it, try to write down what properties a "least upper bound" should have. How many properties are needed to pin down the definition uniquely?

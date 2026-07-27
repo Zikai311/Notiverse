@@ -1,6 +1,6 @@
 # Handout 05 · The Intermediate Value Theorem and Fermat's Theorem
 
-> **Goal of this handout:** Complete the second of the two existence pillars. The **EVT** (handout 04) guarantees that maximum and minimum values exist; the **IVT** guarantees that *every* intermediate value is attained — in particular, that continuous functions cannot skip over zeros. We then introduce the **derivative** and prove **Fermat's Theorem**: at any interior local extremum where the function is differentiable, the derivative must be zero.
+> **Goal of this handout:** Complete the second of the two existence pillars. The **EVT** (handout 04) guarantees that maximum and minimum values exist; the **IVT** guarantees that *every* intermediate value is attained — in particular, that continuous functions cannot skip over zeros. We then recall the **derivative** (introduced in handout 02) and prove **Fermat's Theorem**: at any interior local extremum where the function is differentiable, the derivative must be zero.
 
 **Main theorems:** ⭐ **Intermediate Value Theorem (IVT)**; ⭐ **Fermat's Theorem**.
 
@@ -54,35 +54,23 @@ Neither alternative is possible, so $f(c) = 0$. $\blacksquare$
 
 ---
 
-## 5.3 Interlude: What is a Derivative?
+## 5.3 Recall: The Derivative (Handout 02, Definition 2.7)
 
-Before stating Fermat's Theorem, we need the derivative. It is simply a special case of the function limit from handout 02.
+In handout 02 we defined the derivative as the function limit of the difference quotient:
 
-### Definition 5.2 (Derivative)
+$$f'(x_0) = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0}.$$
 
-We say $f$ is **differentiable at $x_0$** if the following limit exists:
-
-$$f'(x_0) = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} = \lim_{h \to 0} \frac{f(x_0 + h) - f(x_0)}{h}.$$
-
-This limit is called the **derivative** of $f$ at $x_0$. Geometrically it is the slope of the tangent line; physically it is the instantaneous rate of change.
-
-> **The ghost is fully exorcised.** Recall from handout 00: Newton divided by $\Delta x$ and then *discarded* it — treating it as zero after dividing by it. The $\varepsilon$–$\delta$ limit definition handles this cleanly: the quotient $\frac{f(x) - f(x_0)}{x - x_0}$ is formed with $x \ne x_0$ (so division by zero never occurs — recall the $0 < |x - x_0|$ condition in Definition 2.6), and then we ask whether this ratio *approaches* a limit as $x \to x_0$. No infinitesimals, no contradiction.
-
-**Differentiable implies continuous.** If $f$ is differentiable at $x_0$, then $f$ is continuous at $x_0$:
-
-$$f(x) - f(x_0) = \frac{f(x) - f(x_0)}{x - x_0} \cdot (x - x_0) \xrightarrow{x \to x_0} f'(x_0) \cdot 0 = 0.$$
-
-The converse fails: $|x|$ is continuous at $0$ but not differentiable there (the left and right difference quotients give $-1$ and $+1$ respectively).
+Geometrically this is the slope of the tangent line; physically it is the instantaneous rate of change. We also showed there that **differentiable implies continuous** (the converse fails: $|x|$ at $0$). Fermat's Theorem uses only this definition.
 
 ---
 
 ## 5.4 Fermat's Theorem ⭐
 
-### Definition 5.3 (Local Extremum)
+### Definition 5.2 (Local Extremum)
 
 We say $x_0$ is a **local maximum** of $f$ if $f(x) \le f(x_0)$ for all $x$ in some neighbourhood of $x_0$. **Local minimum** is defined symmetrically.
 
-### ⭐ Theorem 5.4 (Fermat's Theorem)
+### ⭐ Theorem 5.3 (Fermat's Theorem)
 
 > If $x_0$ is a local extremum of $f$, $x_0$ is in the **interior** of the domain (not an endpoint), and $f$ is differentiable at $x_0$, then $f'(x_0) = 0$.
 

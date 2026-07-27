@@ -127,6 +127,30 @@ The crucial $0 < |x - x_0|$ says $x \ne x_0$: the limit is about the *approach* 
 
 ---
 
+## 2.8 Application: The Derivative
+
+The $\varepsilon$–$\delta$ definition is now in place. Its first application is the object that motivated the whole enterprise.
+
+### Definition 2.7 (Derivative)
+
+We say $f$ is **differentiable at $x_0$** if the following limit exists:
+
+$$f'(x_0) = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0} = \lim_{h \to 0} \frac{f(x_0 + h) - f(x_0)}{h}.$$
+
+This limit is called the **derivative** of $f$ at $x_0$. Geometrically it is the slope of the tangent line; physically it is the instantaneous rate of change.
+
+> **The ghost is fully exorcised.** Newton divided by $\Delta x$ and then discarded it — treating it as zero after using it as nonzero. The $\varepsilon$–$\delta$ definition handles this cleanly: the difference quotient is formed with $x \ne x_0$ throughout (the $0 < |x - x_0|$ condition in Definition 2.6 keeps the denominator nonzero), and we simply ask whether this ratio approaches a limit. No infinitesimals, no contradiction.
+
+**Differentiable implies continuous.** If $f$ is differentiable at $x_0$, then $f$ is continuous at $x_0$:
+
+$$f(x) - f(x_0) = \frac{f(x) - f(x_0)}{x - x_0} \cdot (x - x_0) \xrightarrow{x \to x_0} f'(x_0) \cdot 0 = 0.$$
+
+The converse fails: $|x|$ is continuous at $0$ but not differentiable there (the left and right difference quotients tend to $-1$ and $+1$ respectively).
+
+The derivative will be used in earnest in handouts 05–06, where we prove Fermat's Theorem and the Mean Value Theorem.
+
+---
+
 ### Exercises
 
 1. Using the $\varepsilon$–$N$ definition directly, prove that $\frac{2n+1}{n+3} \to 2$.

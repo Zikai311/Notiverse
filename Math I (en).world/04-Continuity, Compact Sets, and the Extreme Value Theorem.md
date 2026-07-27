@@ -6,7 +6,28 @@
 
 ---
 
-## 4.1 Continuity: the Sequential Definition
+## 4.1 Motivation: Why Does "Maximum Exists" Need Proof?
+
+Recall the counterexample from handout 00:
+
+$$f(x) = x \text{ on the open interval } (0,1) \text{ has no maximum value.}$$
+
+The function is perfectly continuous and smooth — yet the maximum does not exist, because the interval is **open** and the supremum $1$ is never attained.
+
+Another counterexample: $f(x) = \frac{1}{x}$ on $(0,1]$ is unbounded as $x \to 0^+$, so it has no maximum whatsoever. Here the trouble is that the function "escapes to infinity" near the missing left endpoint.
+
+These examples show that the existence of a maximum is a genuine fact requiring two conditions:
+
+1. **The function is continuous** (otherwise one can create holes or jumps that skip over the maximum);
+2. **The interval is closed and bounded**: $[a,b]$ (otherwise the maximum can "leak out" through a missing endpoint, as in both examples above).
+
+The EVT says: **given exactly these two conditions, the maximum always exists.**
+
+The challenge is: how do we translate the geometric condition "closed and bounded" into the kind of analytic language that drives a proof? The answer is the central concept of this handout: **compactness**.
+
+---
+
+## 4.2 Continuity: the Sequential Definition
 
 ### Definition 4.1 (Continuity)
 
@@ -22,7 +43,7 @@ $f$ is **continuous on $[a,b]$** if it is continuous at every point.
 
 ---
 
-## 4.2 Compact Sets
+## 4.3 Compact Sets
 
 ### Definition 4.2 (Sequential Compactness)
 
@@ -48,7 +69,7 @@ This combines two requirements: the subsequence converges (some limit exists), a
 
 ---
 
-## 4.3 Continuous Image of a Compact Set ⭐
+## 4.4 Continuous Image of a Compact Set ⭐
 
 ### ⭐ Proposition 4.4
 
@@ -60,7 +81,7 @@ This combines two requirements: the subsequence converges (some limit exists), a
 
 ---
 
-## 4.4 The Extreme Value Theorem ⭐
+## 4.5 The Extreme Value Theorem ⭐
 
 ### ⭐ Theorem 4.5 (Extreme Value Theorem, EVT)
 
@@ -84,12 +105,41 @@ Let $M = \sup_{x \in [a,b]} f(x)$. Choose $x_n \in [a,b]$ with $f(x_n) > M - \fr
 
 ---
 
-## 4.5 Summary
+## 4.6 The Dependency Chain
+
+The proof of the EVT is a relay race in which completeness is carried upward through every step:
+
+```
+   Completeness (Handout 01)
+          │
+          ▼
+   Bolzano–Weierstrass (Handout 03)
+          │
+          ▼
+   Heine–Borel: [a,b] is compact  ──┐
+                                    ├──► Continuous image is compact (Prop. 4.4) ──► f([a,b]) compact
+   Sequential continuity (Def. 4.1)─┘                                                       │
+                                                                                             ▼
+                                                                               f([a,b]) closed and bounded
+                                                                                             │
+                                                                         sup exists + closed ⟹ sup attained
+                                                                                             ▼
+                                                                                  ⭐ EVT: max and min exist
+```
+
+**Every arrow carries completeness upward.** The closed interval $[a,b]$ is compact because ℝ is complete (via BW); continuity transfers that compactness to the image; and the image being **closed** is what upgrades "supremum exists" into "maximum is attained". The full chain is:
+
+$$\text{Completeness} \to \text{BW} \to \text{compact domain} \xrightarrow{\text{continuity}} \text{compact image} \to \text{closed} \to \text{sup attained} \to \text{EVT}.$$
+
+---
+
+## 4.7 Summary
 
 - ⭐ **Sequential continuity**: $f$ is continuous at $x_0$ iff $x_n \to x_0 \Rightarrow f(x_n) \to f(x_0)$.
 - ⭐ **Compact** = every sequence has a subsequence converging to a point of the set. In ℝ: compact ↔ closed and bounded (**Heine–Borel**).
 - ⭐ **Continuous image of compact = compact**: compactness transfers from domain to range under continuous maps.
 - ⭐ **EVT**: continuous function on $[a,b]$ attains its max and min. Proof chain: closed interval → compact domain → compact image → sup is attained. Each arrow requires a specific hypothesis.
+- The full dependency chain (§4.6) shows every step traces back to completeness: **EVT is completeness, carried four arrows upward**.
 - The EVT and the IVT (handout 05) are the two main existence theorems of the series: EVT guarantees extrema exist; the next handout provides tools to locate them.
 
 → [Handout 05: The Intermediate Value Theorem and Fermat's Theorem](05-The Intermediate Value Theorem and Fermat's Theorem.md)

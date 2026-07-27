@@ -109,43 +109,40 @@ Therefore: $F(b) - F(a) = \int_a^b f + C - C = \int_a^b f$. $\blacksquare$
 Every theorem in this series has now played its part. Here is the full dependency map:
 
 ```
-           Completeness of ℝ (LUB Axiom)                         [Handout 01]
-                       │
-         ┌─────────────┼──────────────────┐
-         ▼             ▼                   ▼
-    Archimedean   Nested Intervals /     LUB Principle
-     Property         MCT
-         │             │                   │
-         │             ▼                   │
-         │     Bolzano–Weierstrass         │           [Handout 03]
-         │             │                   │
-         ▼             ▼                   ▼
-    ε language  Compact Sets /      ┌── IVT (zeros)  [Handout 05]
-    [Handout 02]  Heine–Borel        │       │
-                      │              │       ▼
-                      ▼              │  Fermat (critical pts)
-              Continuous image       │       │
-              of compact = compact   │       │
-                  ⟹ EVT [H.04]      │       │
-                      │              └───────┤
-                      └──────────┬───────────┘
-                                 ▼
-                        Rolle ⟹ MVT (Lagrange)          [Handout 06]
-                                 │
-                                 ▼
-                     Corollary: f'≡0 ⟹ constant ─────────────────┐
-                                                                  │
-         ┌───────────────────────────────────────┐               │
-         ▼ (uniform continuity ← compactness)    │               ▼
-  Continuous ⟹ Integrable [H.07]                FTC1: Φ'=f  [Handout 08]
-         │                    (uses EVT + IVT) ──┤
-         └──────► Riemann Integral ──────────────►
-                                                  ▼
-                                         FTC2: Newton–Leibniz
-                                         (uses f'≡0 ⟹ const)
-                                                  │
-                                                  ▼
-                                    ★ Differentiation ⇄ Integration ★
+                  Completeness of ℝ (LUB Axiom)                  [Handout 01]
+                              │
+                ┌─────────────┴──────────────┐
+                ▼                            ▼
+         Limits (ε language)  [Handout 02]   Monotone Convergence
+                │                            │
+                ▼                            ▼
+   Bolzano–Weierstrass Theorem  ◄──────  Nested Intervals  [Handout 03]
+   (bounded sequence ⟹ convergent subsequence)
+                │
+                ▼
+       Continuity + Compact sets       [Handout 04]
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+   Extreme Value     Intermediate Value Theorem  [Handout 05]
+   Theorem (EVT)     (IVT — zeros exist)
+   (max/min exist)       │
+        │                ▼
+        │          Fermat's Theorem (critical point condition)
+        │                │
+        └───────┬────────┘
+                ▼
+      Rolle's Theorem ⟹ Mean Value Theorem       [Handout 06]
+                │
+                ▼
+      Corollary: f' ≡ 0 ⟹ f constant    ← bridge to integration
+                │
+      Riemann integral (partition·approximate·sum·limit)  [Handout 07]
+                │
+                ▼
+      Fundamental Theorem of Calculus (FTC)        [Handout 08]
+      · FTC1 (accumulation function is an antiderivative)  ← uses EVT + IVT
+      · FTC2 (Newton–Leibniz formula)               ← uses f' ≡ 0 ⟹ const
 ```
 
 Observe the two inputs to FTC:

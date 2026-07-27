@@ -6,7 +6,23 @@
 
 ---
 
-## 3.1 Subsequences and Cluster Points
+## 3.1 Motivation: Why Are Subsequences Needed?
+
+Handout 02 built a complete theory of convergent sequences. But many important sequences simply do not converge. The alternating sequence
+
+$$x_n = (-1)^n = 1,\,-1,\,1,\,-1,\,\ldots$$
+
+bounces indefinitely and has no limit.
+
+Yet this sequence is **bounded** (all terms lie in $[-1, 1]$). And it visibly contains a convergent piece: the even-indexed terms $x_2, x_4, x_6, \ldots = 1, 1, 1, \ldots$ converge to $1$.
+
+This phenomenon — a bounded but divergent sequence that nonetheless hides a convergent subsequence — turns out to be universal. The **Bolzano–Weierstrass Theorem** asserts: *every bounded sequence of real numbers has a convergent subsequence*, no matter how erratically it oscillates.
+
+**Why do we need this?** Here is the preview: handout 04 will prove the Extreme Value Theorem — a continuous function on $[a,b]$ always attains its maximum. The proof constructs a sequence $(x_n)$ in $[a,b]$ with $f(x_n)$ approaching the supremum. The sequence $x_n$ might oscillate wildly — but since it is bounded (it lives in $[a,b]$), BW guarantees a convergent subsequence $x_{n_k} \to \xi$. **The limit $\xi$ is the point where the maximum is attained.** Without BW, that point cannot be pinned down.
+
+---
+
+## 3.2 Subsequences and Cluster Points
 
 ### Definition 3.1 (Subsequence)
 
@@ -24,7 +40,7 @@ Equivalently: $L$ is a cluster point if and only if some subsequence of $(a_n)$ 
 
 ---
 
-## 3.2 The Bolzano–Weierstrass Theorem ⭐
+## 3.3 The Bolzano–Weierstrass Theorem ⭐
 
 ### ⭐ Theorem 3.3 (Bolzano–Weierstrass)
 
@@ -64,7 +80,7 @@ In either case, a convergent subsequence exists. $\blacksquare$
 
 ---
 
-## 3.3 Cauchy Sequences ⭐
+## 3.4 Cauchy Sequences ⭐
 
 Sometimes we want to know that a sequence converges without being told (or without being able to compute) the limit. The Cauchy criterion gives exactly this.
 
@@ -87,7 +103,7 @@ $$|a_n - L| \le |a_n - a_{n_k}| + |a_{n_k} - L| < \varepsilon. \quad \blacksquar
 
 ---
 
-## 3.4 Summary
+## 3.5 Summary
 
 - **Subsequences** select an infinite collection of terms in order; a **cluster point** is the limit of some subsequence.
 - ⭐ **Bolzano–Weierstrass**: every bounded sequence has a convergent subsequence. Two proofs: (A) bisection + nested intervals; (B) peak-point lemma + MCT. Both trace back to completeness.

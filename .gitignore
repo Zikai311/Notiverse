@@ -9,3 +9,6 @@ npm-debug.log*
 .obsidian/plugins/*/main.js
 .obsidian/plugins/*/manifest.json
 .obsidian/plugins/*/styles.css
+
+# typst-mate: large runtime cache/package data, not plugin config
+.obsidian/plugins/typst-mate/

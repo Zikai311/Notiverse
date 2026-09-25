@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const MarkdownIt = require("markdown-it");
 const markdownItFootnote = require("markdown-it-footnote");
 const katex = require("katex");
+const { NodeCompiler } = require("@myriaddreamin/typst-ts-node-compiler");
 
 const root = path.resolve(__dirname, "..");
 const docsDir = path.join(root, "docs");
@@ -38,6 +39,11 @@ const md = new MarkdownIt({
   linkify: true,
   typographer: true,
 });
+
+const typstCompiler = NodeCompiler.create();
+// Matches the note body color so Typst's baked-in SVG fill reads the same as
+// KaTeX, which inherits `color: currentColor` from `.markdown-body` instead.
+const TYPST_TEXT_COLOR = "#d9d2e8";
 
 installMathRule(md);
 installHeadingAnchors(md);
@@ -323,12 +329,31 @@ function renderNoteHtml(entry, { collectOnly }) {
     usedIds: new Map(),
     headings: [],
     inCallout: false,
+    mathDialect: detectMathDialect(entry.markdown),
   };
 
   const html = md.render(prepareMarkdown(entry.markdown, entry));
   headingsBySlug.set(entry.slug, renderContext.headings);
   renderContext = null;
   return collectOnly ? "" : html;
+}
+
+// A note picks one math dialect for its whole body: LaTeX (KaTeX) or Typst.
+// LaTeX commands are always `\letters`; Typst has no backslash-escaped
+// function names, so a single `\alpha`-style command anywhere in the note's
+// math is enough to call it LaTeX. No such command anywhere means Typst,
+// matching how Obsidian notes have always been written by default.
+function detectMathDialect(markdown) {
+  const bodies = [];
+  const blockPattern = /\$\$([\s\S]*?)\$\$/g;
+  let match;
+  while ((match = blockPattern.exec(markdown))) bodies.push(match[1]);
+  const withoutBlocks = markdown.replace(blockPattern, "");
+  const inlinePattern = /\$([^$\n]+)\$/g;
+  while ((match = inlinePattern.exec(withoutBlocks))) bodies.push(match[1]);
+
+  const hasLatexCommand = bodies.some((body) => /\\[A-Za-z]/.test(body));
+  return hasLatexCommand ? "latex" : "typst";
 }
 
 function allocateHeadingId(text) {
@@ -555,6 +580,11 @@ function headingText(inline) {
 }
 
 function renderMath(source, displayMode) {
+  if (renderContext?.mathDialect === "typst") return renderTypstMath(source, displayMode);
+  return renderLatexMath(source, displayMode);
+}
+
+function renderLatexMath(source, displayMode) {
   try {
     return katex.renderToString(source, {
       displayMode,
@@ -562,6 +592,17 @@ function renderMath(source, displayMode) {
       strict: "ignore",
       output: "html",
     });
+  } catch {
+    return `<code>${escapeHtml(source)}</code>`;
+  }
+}
+
+function renderTypstMath(source, displayMode) {
+  try {
+    const body = displayMode ? `$ ${source} $` : `$${source}$`;
+    const doc = `#set page(width: auto, height: auto, margin: 0pt, fill: none)\n#set text(size: 16pt, fill: rgb("${TYPST_TEXT_COLOR}"))\n${body}`;
+    const svg = typstCompiler.svg({ mainFileContent: doc });
+    return `<span class="typst-math${displayMode ? " typst-math-display" : ""}">${svg}</span>`;
   } catch {
     return `<code>${escapeHtml(source)}</code>`;
   }
@@ -1364,6 +1405,15 @@ a:hover {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 4px 0;
+}
+
+.typst-math svg {
+  vertical-align: middle;
+}
+
+.typst-math-display svg {
+  display: block;
+  margin: 0 auto;
 }
 
 .right-pane .context-card {

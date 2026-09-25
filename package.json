@@ -8,6 +8,7 @@
     "dev": "node scripts/dev-server.js"
   },
   "devDependencies": {
+    "@myriaddreamin/typst-ts-node-compiler": "0.7.0",
     "katex": "^0.16.22",
     "markdown-it": "^14.1.0",
     "markdown-it-footnote": "^4.0.0"

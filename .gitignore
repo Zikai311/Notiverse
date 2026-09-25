@@ -13,5 +13,3 @@ npm-debug.log*
 # typst-mate: large runtime cache/package data, not plugin config
 .obsidian/plugins/typst-mate/
 .obsidian/community-plugins.json
-.obsidian/graph.json
-.obsidian/graph.json

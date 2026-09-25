@@ -1,5 +1,3 @@
-# Lecture 1: Intro to Differential Geometry
-
 ## 1-forms
 
 $$

@@ -1,3 +1,11 @@
 node_modules/
 .DS_Store
 npm-debug.log*
+
+# Obsidian editor state (not build input; graph.json is the one exception,
+# see CLAUDE.md — it drives site graph rendering and stays tracked)
+.obsidian/workspace.json
+.obsidian/plugins/*/data.json
+.obsidian/plugins/*/main.js
+.obsidian/plugins/*/manifest.json
+.obsidian/plugins/*/styles.css

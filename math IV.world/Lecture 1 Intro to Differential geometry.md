@@ -138,12 +138,12 @@ $$
 
 ## Comparison of the four classical theorems
 
-| # | Formula | Left region (domain) | Left-side object | Right region (boundary) | Right-side object |
-|---|---|---|---|---|---|
-| 1 | $integral_a^b (dif f)/(dif x) dif x = f(b) - f(a)$ | $[a,b]$ | derivative | ${a,b}$ | $f$ |
-| 2 | $integral.double_D (diff Q/diff x - diff P/diff y) dif A = integral.cont_(diff D) (P dif x + Q dif y)$ | 2D surface | curl | 1D curve $diff D$ | F circulation |
-| 3 | $integral.double_S (nabla times F) dot n dif A = integral.cont_(diff S) F dot dif r$ | — | — | — | — |
-| 4 | $integral.triple_V (nabla dot F) dif V = integral.double_(diff V) F dot n dif A$ | 3D solid | divergence | 2D surface $diff V$ | F flux |
+| #   | Formula                                                                                                | Left region (domain) | Left-side object | Right region (boundary) | Right-side object |
+| --- | ------------------------------------------------------------------------------------------------------ | -------------------- | ---------------- | ----------------------- | ----------------- |
+| 1   | $integral_a^b (dif f)/(dif x) dif x = f(b) - f(a)$                                                     | $[a,b]$              | derivative       | ${a,b}$                 | $f$               |
+| 2   | $integral.double_D (diff Q/diff x - diff P/diff y) dif A = integral.cont_(diff D) (P dif x + Q dif y)$ | 2D surface           | curl             | 1D curve $diff D$       | F circulation     |
+| 3   | $integral.double_S (nabla times F) dot n dif A = integral.cont_(diff S) F dot dif r$                   | 2D surface           | curl             | 1D curve $diff D$       | F circulation     |
+| 4   | $integral.triple_V (nabla dot F) dif V = integral.double_(diff V) F dot n dif A$                       | 3D solid             | divergence       | 2D surface $diff V$     | F flux            |
 
 General Stokes' theorem unifying all four:
 

@@ -1,3 +1,7 @@
+
+> [!Quote] 
+> *Spoiler:* There is no differential in differential form.
+
 ## Revision of scalar integral on $k"-dim"$ manifold
 
 $$
@@ -36,16 +40,16 @@ $$
 $$
 integral_S f(x,y,z) dif A = integral.double_D f(Phi(u,v)) abs(T_u times T_v) dif u dif v
 $$
-## Motivation - circulation and flux
+## Motivation
+
+Circulation and flux are evaluated by vector integrals, which are not yet unified in one single language.
 
 $$
 integral.cont_C F dot dif s=integral_C F dot gamma'(t) dif t
 $$
-
 $$
 integral.cont_S F dot dif A = integral.double_D F dot (T_u times T_v) dif u dif v
 $$
-
 ## Comparison of the four classical theorems
 
 | #   | Formula                                                                                                | Left region (domain) | Left-side object | Right region (boundary) | Right-side object |
@@ -179,10 +183,10 @@ $$omega = P dif y and dif z + Q dif z and dif x + R dif x and dif y$$
 
 Apply this to a 2D surface $S$ parameterised by $Phi(u,v)$. The tangent vectors are $T_u$ and $T_v$.
 $$omega_F(T_u, T_v) = vec(P,Q,R) dot vec(dif y and dif z, dif z and dif x, dif x and dif y)(T_u, T_v)$$
+Notice that the cross product perfectly matches the fundamental 2-forms evaluated on the tangent vectors. By applying the operators component-wise, we have:
 
-Notice that the cross product perfectly matches the fundamental 2-forms evaluated on the tangent vectors:
-$$upright(bold(T))_u times upright(bold(T))_v = vec(dif y and dif z, dif z and dif x, dif x and dif y)(upright(bold(T))_u, upright(bold(T))_v)$$
-
+$$upright(bold(T))_u times upright(bold(T))_v &= vec((dif y and dif z)(upright(bold(T))_u, upright(bold(T))_v), (dif z and dif x)(upright(bold(T))_u, upright(bold(T))_v), (dif x and dif y)(upright(bold(T))_u, upright(bold(T))_v)) \
+&= vec(dif y and dif z, dif z and dif x, dif x and dif y)(upright(bold(T))_u, upright(bold(T))_v)$$
 Then,
 $$omega_F(T_u, T_v) = F dot (T_u times T_v)$$
 

@@ -4,7 +4,7 @@ $$
 dif V_m = sqrt(det(g)) dif^k u = sqrt(det(J^T J)) dif^k u
 $$
 
-1-dim manifold, curve $gamma(t)$:
+1-dim manifold, curve $gamma:(t)bb(R) mapsto bb(R)^3$:
 
 $$
 g =gamma'(t)^T gamma'(t)= abs(gamma'(t))^2
@@ -17,7 +17,7 @@ $$
 integral_C f(x,y,z) dif s = integral_C f(x,y,z) abs(gamma'(t)) dif t
 $$
 
-2-dim manifold, $Phi(u,v)$:
+2-dim manifold, $Phi(u,v): bb(R)^2 mapsto bb(R)^3$
 
 $$
 J = mat(T_u, T_v), quad J^T = mat(T_u; T_v)
@@ -31,7 +31,7 @@ $$
 det g = abs(T_u)^2 abs(T_v)^2 - (T_u dot T_v)^2 = abs(T_u times T_v)^2
 $$
 $$
-dif V_m = dif A = sqrt(det(g)) dif t = abs(T_u times T_v) dif t
+dif V_m = dif A = sqrt(det(g)) dif u dif v = abs(T_u times T_v) dif u dif v
 $$
 $$
 integral_S f(x,y,z) abs(T_u times T_v) dif u dif v
@@ -39,7 +39,7 @@ $$
 ## Motivation - circulation and flux
 
 $$
-integral.cont_C F dot dif s= F dot gamma'(t) dif t
+integral.cont_C F dot dif s=integral_C F dot gamma'(t) dif t
 $$
 
 $$
@@ -150,11 +150,11 @@ $$
 dif x and dif y
 $$
 
-Could be represented in bilinear antisymmetric form $B: RR^2 times RR^2 -> RR$:
+Could be represented as bilinear antisymmetric form $B: RR^2 times RR^2 -> RR$:
 $$
 dif x and dif y(dot, dot)=B(dot,dot)
 $$
-Properties are as follows:
+with properties are as follows:
 1. $B(arrow(u), arrow(v)) = - B(arrow(v), arrow(u))$
 2. $B(a arrow(u)_1 + b arrow(u)_2, arrow(v)) = a B(arrow(u)_1, arrow(v)) + b B(arrow(u)_2, arrow(v))$
 3. $B(arrow(u), a arrow(v)_1 + b arrow(v)_2) = a B(arrow(u), arrow(v)_1) + b B(arrow(u), arrow(v)_2)$
@@ -182,6 +182,7 @@ and
 $$
  B(arrow(e)_1, arrow(e)_2)= -B(arrow(e)_2, arrow(e)_1)
 $$
+then,
 $$
 B(arrow(u), arrow(v))= (u_1 v_2 - u_2 v_1) B(arrow(e)_1, arrow(e)_2) = det mat(u_1, v_1; u_2, v_2) dot B(arrow(e)_1, arrow(e)_2)
 $$

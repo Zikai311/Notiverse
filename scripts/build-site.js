@@ -600,7 +600,7 @@ function renderLatexMath(source, displayMode) {
 function renderTypstMath(source, displayMode) {
   try {
     const body = displayMode ? `$ ${source} $` : `$${source}$`;
-    const doc = `#set page(width: auto, height: auto, margin: 0pt, fill: none)\n#set text(size: 24pt, fill: rgb("${TYPST_TEXT_COLOR}"))\n${body}`;
+    const doc = `#set page(width: auto, height: auto, margin: 0pt, fill: none)\n#set text(size: 18pt, fill: rgb("${TYPST_TEXT_COLOR}"))\n${body}`;
     const svg = typstCompiler.svg({ mainFileContent: doc });
     return `<span class="typst-math${displayMode ? " typst-math-display" : ""}">${svg}</span>`;
   } catch {

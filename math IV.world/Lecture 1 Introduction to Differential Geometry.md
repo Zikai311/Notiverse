@@ -102,7 +102,7 @@ integral.triple_V (nabla dot F) dif V = integral.double_(diff V) F dot n dif A
 $$
 $V$ is a bounded solid region; $diff V$ is its piecewise-smooth closed boundary.
 
-## 1-forms in 3D space
+## 1-forms in 3 dimension
 Consider a tangent vector $v$ to the curve $C$, defined by 
 $$
 C:gamma(t) = vec(x(t), y(t), z(t))
@@ -144,65 +144,32 @@ $$
 integral_C omega_F = integral_a ^b omega_F (gamma'(t)) dif t = integral_a ^b F dot gamma'(t) dif quad t in [a,b]
 $$
 
-## Wedge product
+## 2-forms in 3 dimension
+Introducing wedge product
 
 $$
-dif x and dif y
+dif x and dif y: RR^3 times RR^3 -> RR
 $$
 
-Could be represented as bilinear antisymmetric form $B: RR^2 times RR^2 -> RR$:
-$$
-dif x and dif y(dot, dot)=B(dot,dot)
-$$
-with properties are as follows:
-1. $B(arrow(u), arrow(v)) = - B(arrow(v), arrow(u))$
-2. $B(a arrow(u)_1 + b arrow(u)_2, arrow(v)) = a B(arrow(u)_1, arrow(v)) + b B(arrow(u)_2, arrow(v))$
-3. $B(arrow(u), a arrow(v)_1 + b arrow(v)_2) = a B(arrow(u), arrow(v)_1) + b B(arrow(u), arrow(v)_2)$
+with so-called antisymmetric bilinear properties as follows:
+1. $arrow(u) and arrow(v) = - arrow(v) and arrow(u)$
+2. $(a arrow(u)_1 + b arrow(u)_2) and arrow(v) = a arrow(u)_1 and arrow(v) + b arrow(u)_2 and arrow(v)$
+3. $arrow(u) and (a arrow(v)_1 + b arrow(v)_2) = a arrow(u) and arrow(v)_1 + b arrow(u) and arrow(v)_2$
 
-$$
-arrow(e)_1 = vec(1,0), quad arrow(e)_2 = vec(0,1)
-$$
-
-$$
-arrow(u) = u_1 arrow(e)_1 + u_2 arrow(e)_2, quad arrow(v) = v_1 arrow(e)_1 + v_2 arrow(e)_2
-$$
-
-$$
-B(arrow(u), arrow(v)) = B(u_1 arrow(e)_1 + u_2 arrow(e)_2,quad v_1 arrow(e)_1 + v_2 arrow(e)_2)
-$$
-
-$$
-= u_1 v_1 B(arrow(e)_1, arrow(e)_1) + u_1 v_2 B(arrow(e)_1, arrow(e)_2) + u_2 v_1 B(arrow(e)_2, arrow(e)_1) + u_2 v_2 B(arrow(e)_2, arrow(e)_2)
-$$
-since,
-$$
-B(arrow(e)_1, arrow(e)_1) = B(arrow(e)_2, arrow(e)_2) = 0
-$$
-and
-$$
- B(arrow(e)_1, arrow(e)_2)= -B(arrow(e)_2, arrow(e)_1)
-$$
-then,
-$$
-B(arrow(u), arrow(v))= (u_1 v_2 - u_2 v_1) B(arrow(e)_1, arrow(e)_2) = det mat(u_1, v_1; u_2, v_2) dot B(arrow(e)_1, arrow(e)_2)
-$$
-let ${} B(arrow(e)_1, arrow(e)_2)=1 {}$,
-$$
-B(arrow(u), arrow(v))= det mat(u_1, v_1; u_2, v_2)$$
-The above derivation shows how an antisymmetric form works in a 2D plane. Now, let's extend this logically to 3D space $RR^3$, where vectors have three components:
+Consider tangent vectors $arrow(u)$ and $arrow(v)$ on surface $S$
 $$
 arrow(u) = u_1 arrow(e)_1 + u_2 arrow(e)_2 + u_3 arrow(e)_3 \
 arrow(v) = v_1 arrow(e)_1 + v_2 arrow(e)_2 + v_3 arrow(e)_3
 $$
 
-If we apply a general antisymmetric bilinear form $B$ to these 3D vectors, we expand it into $3 times 3 = 9$ terms. $$
-B(arrow(u), arrow(v)) = sum_(i=1)^3 sum_(j=1)^3 u_i v_j B(arrow(e)_i, arrow(e)_j)
+If we apply the properties thereof, we expand it into $3 times 3 = 9$ terms. $$
+arrow(u) and arrow(v) = sum_(i=1)^3 sum_(j=1)^3 u_i v_j arrow(e)_i and arrow(e)_j
 
-$$Because $B(arrow(e)_i, arrow(e)_i) = 0$ and $B(arrow(e)_i, arrow(e)_j) = -B(arrow(e)_j, arrow(e)_i)$,
+$$Because $arrow(e)_i and arrow(e)_i = 0$ and $arrow(e)_i and arrow(e)_j = - arrow(e)_j and arrow(e)_i$,
 $$
-B(arrow(u), arrow(v)) = (u_2 v_3 - u_3 v_2) B(arrow(e)_2, arrow(e)_3) + (u_3 v_1 - u_1 v_3) B(arrow(e)_3, arrow(e)_1) + (u_1 v_2 - u_2 v_1) B(arrow(e)_1, arrow(e)_2)
+arrow(u) and arrow(v) = (u_2 v_3 - u_3 v_2) arrow(e)_2 and arrow(e)_3 + (u_3 v_1 - u_1 v_3) arrow(e)_3 and arrow(e)_1 + (u_1 v_2 - u_2 v_1) arrow(e)_1 and arrow(e)_2
 $$$$
-B(arrow(u), arrow(v)) = det mat(u_2, v_2; u_3, v_3) B(arrow(e)_2, arrow(e)_3) + det mat(u_3, v_3; u_1, v_1) B(arrow(e)_3, arrow(e)_1) + det mat(u_1, v_1; u_2, v_2) B(arrow(e)_1, arrow(e)_2)
+arrow(u) and arrow(v) = det mat(u_2, v_2; u_3, v_3) arrow(e)_2 and arrow(e)_3 + det mat(u_3, v_3; u_1, v_1) arrow(e)_3 and arrow(e)_1 + det mat(u_1, v_1; u_2, v_2) arrow(e)_1 and arrow(e)_2
 $$
 In $RR^3$, there is $binom(3,2) = 3$ fundamental 2-forms, which we denote as $dif y and dif z$, $dif z and dif x$, and $dif x and dif y$.
 

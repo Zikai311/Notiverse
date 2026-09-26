@@ -152,9 +152,9 @@ dif x and dif y: RR^3 times RR^3 -> RR
 $$
 
 with so-called antisymmetric bilinear properties as follows:
-1. $arrow(u) and arrow(v) = - arrow(v) and arrow(u)$
-2. $(a arrow(u)_1 + b arrow(u)_2) and arrow(v) = a arrow(u)_1 and arrow(v) + b arrow(u)_2 and arrow(v)$
-3. $arrow(u) and (a arrow(v)_1 + b arrow(v)_2) = a arrow(u) and arrow(v)_1 + b arrow(u) and arrow(v)_2$
+1. $arrow(a) and arrow(b) = - arrow(b) and arrow(a)$
+2. $(lambda arrow(a) + mu arrow(b)) and arrow(c) = lambda arrow(a) and arrow(c) + mu arrow(b) and arrow(c)$
+3. $arrow(a) and (lambda arrow(b) + mu arrow(c)) = lambda arrow(a) and arrow(b) + mu arrow(a) and arrow(c)$
 
 Consider tangent vectors $arrow(u)$ and $arrow(v)$ on surface $S$
 $$

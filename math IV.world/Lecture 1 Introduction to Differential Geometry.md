@@ -1,7 +1,7 @@
-## Revision of scalar integral on $m"-dim"$ manifold
+## Revision of scalar integral on $k"-dim"$ manifold
 
 $$
-dif V_m = sqrt(det(g)) dif^k u = sqrt(det(J^T J)) dif^k u
+dif V_k = sqrt(det(g)) dif^k u quad g=J^T J
 $$
 
 1-dim manifold, curve $gamma:(t)bb(R) mapsto bb(R)^3$:
@@ -102,7 +102,7 @@ integral.triple_V (nabla dot F) dif V = integral.double_(diff V) F dot n dif A
 $$
 $V$ is a bounded solid region; $diff V$ is its piecewise-smooth closed boundary.
 
-## 1-forms
+## 1-forms in 3D space
 Consider a tangent vector $v$ to the curve $C$, defined by 
 $$
 C:gamma(t) = vec(x(t), y(t), z(t))
@@ -141,7 +141,7 @@ $$
 Vector line integral:
 
 $$
-integral_(gamma(t)) omega_F = integral omega_F (gamma'(t)) dif t = integral F dot gamma'(t) dif t
+integral_C omega_F = integral_a ^b omega_F (gamma'(t)) dif t = integral_a ^b F dot gamma'(t) dif quad t in [a,b]
 $$
 
 ## Wedge product
@@ -189,28 +189,38 @@ $$
 let ${} B(arrow(e)_1, arrow(e)_2)=1 {}$,
 $$
 B(arrow(u), arrow(v))= det mat(u_1, v_1; u_2, v_2)$$
+The above derivation shows how an antisymmetric form works in a 2D plane. Now, let's extend this logically to 3D space $RR^3$, where vectors have three components:
+$$
+arrow(u) = u_1 arrow(e)_1 + u_2 arrow(e)_2 + u_3 arrow(e)_3 \
+arrow(v) = v_1 arrow(e)_1 + v_2 arrow(e)_2 + v_3 arrow(e)_3
+$$
+
+If we apply a general antisymmetric bilinear form $B$ to these 3D vectors, we expand it into $3 times 3 = 9$ terms. $$
+B(arrow(u), arrow(v)) = sum_(i=1)^3 sum_(j=1)^3 u_i v_j B(arrow(e)_i, arrow(e)_j)
+
+$$Because $B(arrow(e)_i, arrow(e)_i) = 0$ and $B(arrow(e)_i, arrow(e)_j) = -B(arrow(e)_j, arrow(e)_i)$,
+$$
+B(arrow(u), arrow(v)) = (u_2 v_3 - u_3 v_2) B(arrow(e)_2, arrow(e)_3) + (u_3 v_1 - u_1 v_3) B(arrow(e)_3, arrow(e)_1) + (u_1 v_2 - u_2 v_1) B(arrow(e)_1, arrow(e)_2)
+$$$$
+B(arrow(u), arrow(v)) = det mat(u_2, v_2; u_3, v_3) B(arrow(e)_2, arrow(e)_3) + det mat(u_3, v_3; u_1, v_1) B(arrow(e)_3, arrow(e)_1) + det mat(u_1, v_1; u_2, v_2) B(arrow(e)_1, arrow(e)_2)
+$$
+In $RR^3$, there is $binom(3,2) = 3$ fundamental 2-forms, which we denote as $dif y and dif z$, $dif z and dif x$, and $dif x and dif y$.
+
 ## General 2-forms
 
-
-
-$$
-dif x and dif y (arrow(u), arrow(v))  = det mat(u_1, v_1; u_2, v_2)
-$$
+By defining the fundamental mappings:
 
 $$
-dif y and dif z (arrow(u), arrow(v)) = det mat(u_2, v_2; u_3, v_3)
-$$
-
-$$
-dif x and dif z (arrow(u), arrow(v)) = det mat(u_1, v_1; u_3, v_3)
+dif y and dif z (arrow(u), arrow(v)) = det mat(u_2, v_2; u_3, v_3) \
+dif z and dif x (arrow(u), arrow(v)) = det mat(u_3, v_3; u_1, v_1) \
+dif x and dif y (arrow(u), arrow(v)) = det mat(u_1, v_1; u_2, v_2)
 $$
 
 $$
 binom(3,2) = 3 quad "basic 2-forms"
 $$
-
 $$
-(T_u times T_v) = vec(dif y and dif z, dif z and dif x, dif x and dif y)(u,v)
+$ $ upright(bold(T))_(u) times upright(bold(T))_(v) =vec(d y and d z, d z and d x, d x and d y)(upright(bold(T))_(u), upright(bold(T))_(v)) $ $
 $$
 
 General 2-form:
@@ -230,6 +240,5 @@ omega_F (T_u, T_v) = F dot (T_u times T_v)
 $$
 hence,
 $$
-integral.double_(Phi(u,v)) omega_F = integral.double F dot (T_u times T_v) dif u dif v
+integral.double_(S) omega_F = integral.double_(D) F dot (T_u times T_v) dif u dif v quad u,v in D
 $$
-

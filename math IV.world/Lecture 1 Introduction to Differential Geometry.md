@@ -1,8 +1,8 @@
 
-> [!Quote] 
+> [!Quote] Notes
 > *Spoiler:* There is no differential in differential form.
 
-## Revision of scalar integral on $k"-dim"$ manifold
+## Revision of scalar integral on k-dim manifold
 
 $$
 dif V_k = sqrt(det(g)) dif^k u quad g=J^T J
@@ -26,14 +26,13 @@ $$
 $$
 J = mat(T_u, T_v), quad J^T = mat(T_u; T_v)
 $$
-
 $$
 J^T J = mat(T_u dot T_u, T_u dot T_v; T_v dot T_u, T_v dot T_v) = g
 $$
-
 $$
 det g = abs(T_u)^2 abs(T_v)^2 - (T_u dot T_v)^2 = abs(T_u times T_v)^2
 $$
+
 $$
 dif V_2 = dif A = sqrt(det(g)) dif u dif v = abs(T_u times T_v) dif u dif v
 $$
@@ -196,4 +195,8 @@ F = vec(P(x,y,z), Q(x,y,z), R(x,y,z))
 $$
 
 Hence, the surface integral becomes:
+
 $$integral.double_S omega_F = integral.double_D F(Phi(u,v)) dot (T_u times T_v) dif u dif v quad u,v in D$$
+
+
+This notes was written by Zikai with special thanks to *ovo-Tim* (https://github.com/ovo-Tim)

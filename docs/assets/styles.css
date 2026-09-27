@@ -459,8 +459,10 @@ a:hover {
   margin: 0 auto;
   padding: 42px 0 84px;
   color: var(--text);
-  line-height: 1.68;
+  line-height: 1.4;
   font-size: 16px;
+  font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
 }
 
 .markdown-body h1,
@@ -501,6 +503,15 @@ a:hover {
 .markdown-body pre,
 .markdown-body table {
   margin: 12px 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.5em;
+}
+
+.markdown-body li::marker {
+  font-weight: 400;
 }
 
 .markdown-body code {
@@ -585,6 +596,12 @@ a:hover {
 
 .typst-math svg {
   vertical-align: middle;
+}
+
+.typst-math-display {
+  display: block;
+  text-align: center;
+  margin: 0.6em 0;
 }
 
 .typst-math-display svg {

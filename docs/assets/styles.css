@@ -569,6 +569,14 @@ a:hover {
   color: var(--danger);
 }
 
+.markdown-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  border-radius: 4px;
+}
+
 .callout {
   margin: 16px 0;
   padding: 11px 14px;

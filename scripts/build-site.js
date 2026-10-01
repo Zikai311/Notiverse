@@ -34,6 +34,23 @@ const noteFiles = worldSources.flatMap((world) =>
 
 const graphConfig = readJson(path.join(vaultConfigDir, "graph.json"), {});
 
+// Static image attachments live beside the notes. Each one is copied into
+// docs/assets/images under a content-hashed name, so an Obsidian embed
+// (`![[photo.png]]`) or a standard Markdown image (`![](photo.png)`) can be
+// rewritten to a URL that actually exists on the published site.
+const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".avif"]);
+const imageRecords = collectImageRecords();
+const imageByRel = new Map();
+const imageByWorldRel = new Map();
+const imageByBase = new Map();
+for (const record of imageRecords) {
+  imageByRel.set(record.rel.toLowerCase(), record);
+  imageByWorldRel.set(`${record.world}\u0000${record.worldRel.toLowerCase()}`, record);
+  const key = record.base.toLowerCase();
+  if (!imageByBase.has(key)) imageByBase.set(key, []);
+  imageByBase.get(key).push(record);
+}
+
 const md = new MarkdownIt({
   html: true,
   linkify: true,
@@ -176,6 +193,7 @@ writeFile("assets/favicon.svg", faviconSvg);
 writeFile(".nojekyll", "");
 
 copyKatexAssets();
+copyImageAssets();
 
 const worldSummary = worlds.map((world) => `${world.name} (${world.noteSlugs.length})`).join(", ");
 console.log(`Built ${notes.length} notes across ${worlds.length} world(s) into ${path.relative(root, docsDir)}: ${worldSummary}`);
@@ -245,6 +263,103 @@ function collectMarkdown(dir) {
   return files;
 }
 
+function isImagePath(file) {
+  return IMAGE_EXTENSIONS.has(path.extname(file).toLowerCase());
+}
+
+function toPosix(file) {
+  return file.split(path.sep).join("/");
+}
+
+function collectImages(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
+      if (entry.name.endsWith(WORLD_SUFFIX)) continue;
+      files.push(...collectImages(full));
+      continue;
+    }
+    if (entry.isFile() && isImagePath(entry.name)) files.push(full);
+  }
+  return files;
+}
+
+function collectImageRecords() {
+  const records = [];
+  for (const world of worldSources) {
+    const worldRoot = path.join(root, world.dir);
+    for (const abs of collectImages(worldRoot)) {
+      const base = path.basename(abs);
+      const ext = path.extname(base).toLowerCase();
+      const stem = slugify(path.basename(base, path.extname(base))) || "image";
+      const hash = contentHash(fs.readFileSync(abs)).slice(0, 8);
+      records.push({
+        abs,
+        world: world.name,
+        rel: toPosix(path.relative(root, abs)),
+        worldRel: toPosix(path.relative(worldRoot, abs)),
+        base,
+        ext,
+        url: `assets/images/${stem}-${hash}${ext}`,
+      });
+    }
+  }
+  return records;
+}
+
+// Obsidian resolves embeds by filename (shortest path wins), Markdown images by
+// path relative to the note. Try both, preferring a match in the same world.
+function resolveImageRef(rawTarget, entry, { relativeToNote = false } = {}) {
+  let ref = String(rawTarget || "").trim();
+  if (!ref) return null;
+  ref = ref.replace(/\\/g, "/").replace(/^<|>$/g, "");
+  try {
+    ref = decodeURIComponent(ref);
+  } catch {
+    // Leave the reference untouched if it is not valid percent-encoding.
+  }
+  if (/^[a-z][a-z0-9+.-]*:/i.test(ref) || ref.startsWith("/") || ref.startsWith("#")) return null;
+
+  const normalized = toPosix(path.normalize(ref));
+  if (relativeToNote) {
+    const relToNote = toPosix(path.normalize(path.join(path.dirname(entry.file), ref)));
+    const match = imageByRel.get(relToNote.toLowerCase());
+    if (match) return match;
+  }
+
+  const worldMatch = imageByWorldRel.get(`${entry.world}\u0000${normalized.toLowerCase()}`);
+  if (worldMatch) return worldMatch;
+
+  const rootMatch = imageByRel.get(normalized.toLowerCase());
+  if (rootMatch) return rootMatch;
+
+  const candidates = imageByBase.get(path.basename(ref).toLowerCase()) || [];
+  if (candidates.length) {
+    const sameWorld = candidates.find((candidate) => candidate.world === entry.world);
+    return sameWorld || (candidates.length === 1 ? candidates[0] : null);
+  }
+  return null;
+}
+
+function renderImageTag(record, alt, width) {
+  const widthAttr = width ? ` style="width:${width}px"` : "";
+  const altAttr = alt ? ` alt="${escapeHtml(alt)}"` : ` alt=""`;
+  return `<img class="note-image" src="${record.url}"${altAttr}${widthAttr} loading="lazy">`;
+}
+
+function copyImageAssets() {
+  const targetRoot = path.join(assetsDir, "images");
+  fs.rmSync(targetRoot, { recursive: true, force: true });
+  for (const record of imageRecords) {
+    const dest = path.join(docsDir, record.url);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(record.abs, dest);
+  }
+}
+
 // Wikilinks and relative *.md links both become graph edges. Both are resolved
 // against the note's own world first, so two worlds can reuse a note title.
 function collectLinks(entry) {
@@ -261,7 +376,7 @@ function collectLinks(entry) {
   let match;
   while ((match = wikiLink.exec(entry.markdown))) {
     const target = parseWikiTarget(match[1]);
-    if (!target.title) continue;
+    if (!target.title || isImagePath(target.title)) continue;
     push(resolveTitle(target.title, entry.world), target.title, target.heading);
   }
 
@@ -386,39 +501,62 @@ function stripMarkdown(input) {
 }
 
 function prepareMarkdown(markdown, entry) {
-  return normalizeDisplayMath(transformCallouts(markdown))
-    .replace(/!?\[\[([^\]]+)\]\]/g, (_, body) => {
-      const alias = body.includes("|") ? body.slice(body.indexOf("|") + 1).trim() : "";
-      const { title, heading } = parseWikiTarget(body);
-      const label = (alias || heading || title).trim();
+  return (
+    normalizeDisplayMath(transformCallouts(markdown))
+      // Image embeds: `![[photo.png]]` or `![[photo.png|320]]` (width in px).
+      // A target that is not an image falls through to the wikilink pass below.
+      .replace(/!\[\[([^\]]+)\]\]/g, (whole, body) => {
+        const [rawTarget, ...modifiers] = body.split("|");
+        const record = resolveImageRef(rawTarget, entry);
+        if (!record) return whole;
+        const modifier = modifiers.join("|").trim();
+        return /^\d+$/.test(modifier)
+          ? renderImageTag(record, "", Number(modifier))
+          : renderImageTag(record, modifier, null);
+      })
+      // Standard Markdown images whose source lives in the vault.
+      .replace(/!\[([^\]]*)\]\(\s*(<[^>]+>|[^)\s]+)(?:\s+["'][^"']*["'])?\s*\)/g, (whole, alt, rawSrc) => {
+        const src = rawSrc.replace(/^<|>$/g, "");
+        const record = resolveImageRef(src, entry, { relativeToNote: true });
+        if (!record) {
+          if (!/^[a-z][a-z0-9+.-]*:/i.test(src) && !src.startsWith("/")) recordUnresolved(entry, src);
+          return whole;
+        }
+        return renderImageTag(record, alt, null);
+      })
+      .replace(/!?\[\[([^\]]+)\]\]/g, (_, body) => {
+        const alias = body.includes("|") ? body.slice(body.indexOf("|") + 1).trim() : "";
+        const { title, heading } = parseWikiTarget(body);
+        const label = (alias || heading || title).trim();
 
-      // `[[#Heading]]` is a link inside the current note.
-      if (!title) {
-        return `<a class="internal-link" href="#${encodeURIComponent(noteHeadingId(entry, heading))}">${escapeHtml(label)}</a>`;
-      }
+        // `[[#Heading]]` is a link inside the current note.
+        if (!title) {
+          return `<a class="internal-link" href="#${encodeURIComponent(noteHeadingId(entry, heading))}">${escapeHtml(label)}</a>`;
+        }
 
-      const slug = resolveTitle(title, entry.world);
-      if (!slug) {
-        recordUnresolved(entry, `[[${body}]]`);
-        return `<span class="missing-link">${escapeHtml(label)}</span>`;
-      }
-      const hash = heading ? `#${encodeURIComponent(noteHeadingId(slug, heading))}` : "";
-      return `<a class="internal-link" href="#/note/${encodeURIComponent(slug)}${hash}">${escapeHtml(label)}</a>`;
-    })
-    // Relative *.md links (used by the Math I table of contents) point at vault
-    // files, which do not exist on the site. Rewrite them into hash routes.
-    .replace(/\[([^\]]*)\]\(([^)\s]+\.md)(#[^)\s]*)?\)/g, (whole, label, href, hash) => {
-      const resolved = resolveRelativeMd(href, entry);
-      if (!resolved) {
-        recordUnresolved(entry, href);
-        return `<span class="missing-link">${escapeHtml(label || href)}</span>`;
-      }
-      const anchor = hash ? `#${encodeURIComponent(noteHeadingId(resolved.slug, hash.slice(1)))}` : "";
-      return `<a class="internal-link" href="#/note/${encodeURIComponent(resolved.slug)}${anchor}">${escapeHtml(label || resolved.title)}</a>`;
-    })
-    .replace(/(^|\s)#([A-Za-z0-9_/-]+)/g, (_, prefix, tag) => {
-      return `${prefix}<a class="tag-link" href="#/tag/${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`;
-    });
+        const slug = resolveTitle(title, entry.world);
+        if (!slug) {
+          recordUnresolved(entry, `[[${body}]]`);
+          return `<span class="missing-link">${escapeHtml(label)}</span>`;
+        }
+        const hash = heading ? `#${encodeURIComponent(noteHeadingId(slug, heading))}` : "";
+        return `<a class="internal-link" href="#/note/${encodeURIComponent(slug)}${hash}">${escapeHtml(label)}</a>`;
+      })
+      // Relative *.md links (used by the Math I table of contents) point at vault
+      // files, which do not exist on the site. Rewrite them into hash routes.
+      .replace(/\[([^\]]*)\]\(([^)\s]+\.md)(#[^)\s]*)?\)/g, (whole, label, href, hash) => {
+        const resolved = resolveRelativeMd(href, entry);
+        if (!resolved) {
+          recordUnresolved(entry, href);
+          return `<span class="missing-link">${escapeHtml(label || href)}</span>`;
+        }
+        const anchor = hash ? `#${encodeURIComponent(noteHeadingId(resolved.slug, hash.slice(1)))}` : "";
+        return `<a class="internal-link" href="#/note/${encodeURIComponent(resolved.slug)}${anchor}">${escapeHtml(label || resolved.title)}</a>`;
+      })
+      .replace(/(^|\s)#([A-Za-z0-9_/-]+)/g, (_, prefix, tag) => {
+        return `${prefix}<a class="tag-link" href="#/tag/${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`;
+      })
+  );
 }
 
 // Resolve a heading reference against the ids the target note actually produced.
@@ -1391,6 +1529,14 @@ a:hover {
 
 .missing-link {
   color: var(--danger);
+}
+
+.markdown-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  border-radius: 4px;
 }
 
 .callout {

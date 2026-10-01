@@ -1533,8 +1533,10 @@ a:hover {
 
 .markdown-body img {
   display: block;
-  max-width: 100%;
+  width: auto;
   height: auto;
+  max-width: min(100%, 520px);
+  max-height: 70vh;
   margin: 16px auto;
   border-radius: 4px;
 }
